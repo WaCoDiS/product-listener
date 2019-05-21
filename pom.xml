@@ -20,6 +20,7 @@
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
         <springfox-version>2.9.2</springfox-version>
+        <wps-client-lib.version>1.0.3-SNAPSHOT</wps-client-lib.version>
     </properties>
 
     <dependencies>
@@ -60,6 +61,12 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.n52.geoprocessing</groupId>
+            <artifactId>wps-client-lib</artifactId>
+            <version>${wps-client-lib.version}</version>
         </dependency>
 
         <dependency>

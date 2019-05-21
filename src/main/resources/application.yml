@@ -25,5 +25,5 @@ spring:
     username: rabbitmq
     password: rabbitmq
 productlistener:
-  python-script-location: /home/matthes/git/wacodis/productlistener/src/test/resources/dummy-ingestion.py
-  wps-base-url: https://wacodis.eftas.de/wps
+  python-script-location: /home/matthes/git/wacodis/product-listener/src/test/resources/dummy-ingestion.py
+  wps-base-url: http://geoprocessing.demo.52north.org/javaps/service

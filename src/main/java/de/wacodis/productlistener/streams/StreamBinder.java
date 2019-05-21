@@ -48,8 +48,8 @@ public class StreamBinder implements InitializingBean {
             }
             ProductDescription dummyResult = new ProductDescription();
             dummyResult.setProductCollection("EO:WACODIS:DAT:LAND-CLASSIFICATION");
-            dummyResult.setJobIdentifier("asddasdsad-test-id");
-            dummyResult.setOutputIdentifiers(Collections.singletonList("raster"));
+            dummyResult.setJobIdentifier("a2dec313-108a-4741-af23-c1d62fa96288");
+            dummyResult.setOutputIdentifiers(Collections.singletonList("result"));
             onNewProcessResult(dummyResult);
         }).start();
     }
