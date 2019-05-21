@@ -40,18 +40,18 @@ public class StreamBinder implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                LOG.warn(ex.getMessage());
-            }
-            ProductDescription dummyResult = new ProductDescription();
-            dummyResult.setProductCollection("EO:WACODIS:DAT:LAND-CLASSIFICATION");
-            dummyResult.setJobIdentifier("a2dec313-108a-4741-af23-c1d62fa96288");
-            dummyResult.setOutputIdentifiers(Collections.singletonList("result"));
-            onNewProcessResult(dummyResult);
-        }).start();
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException ex) {
+//                LOG.warn(ex.getMessage());
+//            }
+//            ProductDescription dummyResult = new ProductDescription();
+//            dummyResult.setProductCollection("EO:WACODIS:DAT:LAND-CLASSIFICATION");
+//            dummyResult.setJobIdentifier("a2dec313-108a-4741-af23-c1d62fa96288");
+//            dummyResult.setOutputIdentifiers(Collections.singletonList("result"));
+//            onNewProcessResult(dummyResult);
+//        }).start();
     }
     
     @Async
