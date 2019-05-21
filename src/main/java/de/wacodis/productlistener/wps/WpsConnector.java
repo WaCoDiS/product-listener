@@ -6,6 +6,7 @@
 package de.wacodis.productlistener.wps;
 
 import java.nio.file.Path;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 public interface WpsConnector {
 
-    public Path resolveProcessResult(String jobId, String outputIdentifier);
+    public List<Path> resolveProcessResult(String jobId, String... outputIdentifier);
     
 }

@@ -3,10 +3,13 @@ package de.wacodis.productlistener.streams;
 
 import de.wacodis.productlistener.IngestionBackend;
 import de.wacodis.productlistener.IngestionException;
-import de.wacodis.productlistener.model.NewProcessResultAvailable;
-import de.wacodis.productlistener.model.NewProductAvailable;
+import de.wacodis.productlistener.model.AbstractDataEnvelopeTimeFrame;
+import de.wacodis.productlistener.model.ProductDescription;
+import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
 import de.wacodis.productlistener.wps.WpsConnector;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,31 +46,40 @@ public class StreamBinder implements InitializingBean {
             } catch (InterruptedException ex) {
                 LOG.warn(ex.getMessage());
             }
-            NewProcessResultAvailable dummyResult = new NewProcessResultAvailable();
-            dummyResult.setCollectionId("EO:WACODIS:DAT:LAND-CLASSIFICATION");
-            dummyResult.setJobId("asddasdsad-test-id");
-            dummyResult.setOutputIdentifier("raster");
+            ProductDescription dummyResult = new ProductDescription();
+            dummyResult.setProductCollection("EO:WACODIS:DAT:LAND-CLASSIFICATION");
+            dummyResult.setJobIdentifier("asddasdsad-test-id");
+            dummyResult.setOutputIdentifiers(Collections.singletonList("raster"));
             onNewProcessResult(dummyResult);
         }).start();
     }
     
     @Async
-    public void publishNewProductAvailable(NewProductAvailable p) {
+    public void publishNewProductAvailable(WacodisProductDataEnvelope p) {
         channels.publishNewProduct().send(MessageBuilder.withPayload(p).build());
         LOG.info("Published a new product availability: {}", p);
     }
     
     @StreamListener(StreamChannels.NEW_PROCESS_RESULT_AVAILABLE)
-    public void onNewProcessResult(NewProcessResultAvailable r) {
+    public void onNewProcessResult(ProductDescription r) {
         LOG.info("New process result available: {}", r);
-        Path resultFile = this.wpsConnector.resolveProcessResult(r.getJobId(), r.getOutputIdentifier());
+        String[] asArray = new String[r.getOutputIdentifiers().size()];
+        asArray = r.getOutputIdentifiers().toArray(asArray);
+        List<Path> resultFiles = this.wpsConnector.resolveProcessResult(r.getJobIdentifier(), asArray);
         
         try {
-            this.backend.ingestFileIntoCollection(resultFile, r.getCollectionId());
+            for (Path resultFile : resultFiles) {
+                this.backend.ingestFileIntoCollection(resultFile, r.getProductCollection());
+            }
             
-            NewProductAvailable p = new NewProductAvailable();
-            p.setCollectionId(r.getCollectionId());
-            p.setIngestionTime(new DateTime());
+            WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
+            p.setProductCollection(r.getProductCollection());
+            p.setCreated(new DateTime());
+            p.setModified(p.getCreated());
+            AbstractDataEnvelopeTimeFrame tf = new AbstractDataEnvelopeTimeFrame();
+            tf.setEndTime(p.getCreated());
+            tf.setStartTime(p.getCreated());
+            p.setTimeFrame(tf);
             
             this.publishNewProductAvailable(p);
         } catch (IngestionException ex) {
