@@ -24,6 +24,13 @@ spring:
     port: 5672
     username: rabbitmq
     password: rabbitmq
-productlistener:
+product-listener:
   python-script-location: /home/matthes/git/wacodis/product-listener/src/test/resources/dummy-ingestion.py
   wps-base-url: http://geoprocessing.demo.52north.org/javaps/service
+  product-collection-mapping:
+    - product-collection: EO:WACODIS:DAT:LAND-COVER-CLASSIFICATION
+      product-type: land-cover-classification
+      service-name: wacodis/land-cover/ImageServer
+    - product-collection: EO:WACODIS:DAT:NDVI
+      product-type: ndvi
+      service-name: wacodis/ndvi/ImageServer

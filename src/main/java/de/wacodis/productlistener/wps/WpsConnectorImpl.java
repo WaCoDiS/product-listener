@@ -22,6 +22,7 @@ import org.n52.geoprocessing.wps.client.model.execution.ComplexData;
 import org.n52.geoprocessing.wps.client.model.execution.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -36,8 +37,11 @@ public class WpsConnectorImpl implements WpsConnector {
     
     private static final Logger LOG = LoggerFactory.getLogger(WpsConnectorImpl.class);
     
-    @Value("${productlistener.wps-base-url}")
+    @Value("${product-listener.wps-base-url}")
     private String wpsBaseUrl;
+    
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public List<Path> resolveProcessResult(String jobId, String... outputIdentifier) {
@@ -47,7 +51,7 @@ public class WpsConnectorImpl implements WpsConnector {
         
         WPSClientSession session = WPSClientSession.getInstance();
         try {
-            Result result = session.retrieveProcessResult(wpsBaseUrl, jobId);
+            Result result = session.retrieveProcessResult(this.wpsBaseUrl, jobId);
             List<Path> resultingFiles = new ArrayList<>();
             
             for (String oi : outputIdentifier) {
@@ -67,14 +71,39 @@ public class WpsConnectorImpl implements WpsConnector {
     }
 
     private Path storeFile(Data data) throws IOException, URISyntaxException {
-        URI asUri;
+        
+        ComplexData complexData;
         if (data instanceof ComplexData) {
-            asUri = ((ComplexData) data).getReference().getHref().toURI();
+            complexData = ((ComplexData) data);
         } else {
-            asUri = data.asComplexData().getReference().getHref().toURI();            
+            complexData = data.asComplexData();
         }
         
-        Resource response = new RestTemplate().getForObject(asUri, Resource.class);
+        // we currently only support result by reference
+        URI asUri;
+        if (complexData.getReference() != null && complexData.getReference().getHref() != null) {
+            asUri = complexData.getReference().getHref().toURI();
+        } else {
+            throw new IOException("Could not resolve reference of process output: " + complexData);
+        }
+        
+        // two cases can happen here:
+        // 1) no RequestBody: it is a plain HTTP GET link
+        // 2) a RequestBody with Body or BodyReference: a HTTP POST must be done with the body
+        // currently we only support HTTP GET
+        
+        if (complexData.getReference().getBody() != null) {
+            LOG.warn("A complex data with a POST body was found. This is currently not supported. POST body: " + complexData.getReference().getBody());
+            throw new IOException("Unsupported reference via HTTP POST");
+        }
+        
+        if (complexData.getReference().getBodyReference() != null) {
+            LOG.warn("A complex data with a reference to POST body was found. This is currently not supported. POST body: " + complexData.getReference().getBodyReference());
+            throw new IOException("Unsupported reference via HTTP POST");
+        }
+        
+        // do the download
+        Resource response = this.restTemplate.getForObject(asUri, Resource.class);
         
         if (response == null) {
             throw new IOException("Could not download result from WPS.");

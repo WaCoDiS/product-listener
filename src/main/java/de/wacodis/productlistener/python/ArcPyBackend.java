@@ -28,7 +28,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(ArcPyBackend.class);
 
-    @Value("${productlistener.python-script-location}")
+    @Value("${product-listener.python-script-location}")
     private String pythonScriptLocation;
     
     private Path pythonScript;
@@ -50,7 +50,8 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
     }
 
     @Override
-    public void ingestFileIntoCollection(Path resultFile, String collectionId) throws IngestionException {
+    public void ingestFileIntoCollection(Path resultFile, String collectionId,
+            String serviceName) throws IngestionException {
         ProcessBuilder builder = new ProcessBuilder();
         String pythonScriptCommand = String.format("python %s %s %s",
                 this.pythonScript.toAbsolutePath().toString(),
@@ -75,8 +76,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
                 LOG.warn("Python script ended with non-zero exit code: {}", exitCode);
             }
         } catch (IOException | InterruptedException ex) {
-            LOG.warn("Error on ingestion execution: " + ex.getMessage());
-            LOG.debug("Error on ingestion execution: " + ex.getMessage(), ex);
+            throw new IngestionException(ex.getMessage(), ex);
         }
     }
 
