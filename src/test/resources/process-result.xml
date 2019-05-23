@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wps:Result xmlns:wps="http://www.opengis.net/wps/2.0" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/2.0 http://schemas.opengis.net/wps/2.0/wps.xsd">
+    <wps:JobID>91c5094f-7b76-402a-9574-f87d890c8018</wps:JobID>
+    <wps:ExpirationDate>2019-05-23T13:30:12.040644Z</wps:ExpirationDate>
+    <wps:Output id="result">
+        <wps:Reference xlink:href="http://geoprocessing.demo.52north.org:8080/javaps/results/91c5094f-7b76-402a-9574-f87d890c8018/result" mimeType="image/tiff"/>
+    </wps:Output>
+    <wps:Output id="metadata">
+        <wps:Data mimeType="application/json" encoding="UTF-8"><![CDATA[
+{
+   "sourceType":"CopernicusDataEnvelope",
+   "areaOfInterest":{
+      "extent":[
+         51.0,
+         6.0,
+         52.0,
+         7.0
+      ]
+   },
+   "timeFrame":{
+      "startTime":"2019-05-15T10:36:43Z",
+      "endTime":"2019-05-15T10:36:57Z"
+   },
+   "datasetId":"20190515T103657_32UMB_0"
+}]]></wps:Data>
+    </wps:Output>
+</wps:Result>

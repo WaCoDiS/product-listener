@@ -5,6 +5,7 @@
  */
 package de.wacodis.productlistener.wps;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,23 @@ import org.springframework.stereotype.Component;
 @Component
 public interface WpsConnector {
 
+    /**
+     * resolves (e.g. store the body or download the reference) of one or more process
+     * results.
+     * 
+     * @param jobId the WPS job id
+     * @param outputIdentifier the identifiers of the to be extracted outputs
+     * @return a list of files, containing the outputs
+     */
     public List<Path> resolveProcessResult(String jobId, String... outputIdentifier);
+
+    /**
+     * provides the contents of an inline process result output as a String.
+     * 
+     * @param jobId the WPS job id
+     * @param outputIdentifier the identifiers of the to be provided output
+     * @return the output body as a String
+     */
+    public String getProcessResult(String jobId, String outputIdentifier) throws IOException;
     
 }

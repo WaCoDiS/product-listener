@@ -6,15 +6,19 @@
 package de.wacodis.productlistener;
 
 import de.wacodis.productlistener.configuration.ProductListenerConfig;
+import de.wacodis.productlistener.decode.JsonDecoder;
 import de.wacodis.productlistener.model.AbstractDataEnvelope;
 import de.wacodis.productlistener.model.AbstractDataEnvelopeTimeFrame;
+import de.wacodis.productlistener.model.CopernicusDataEnvelope;
 import de.wacodis.productlistener.model.ProductDescription;
 import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
 import de.wacodis.productlistener.streams.StreamBinder;
 import de.wacodis.productlistener.wps.WpsConnector;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -40,6 +44,9 @@ public class NewProductHandler implements InitializingBean {
     
     @Autowired
     private StreamBinder streams;
+    
+    @Autowired
+    private JsonDecoder jsonDecoder;
     
     @Autowired
     private ProductlistenerApplication.AppConfiguration productCollectionMapping;
@@ -69,25 +76,34 @@ public class NewProductHandler implements InitializingBean {
                     this.backend.ingestFileIntoCollection(resultFile, r.getProductCollection(), collProperties.getServiceName());
                 }
 
+                // retrieve the metadata (i.e. the copernicus data envelope of the input product)
+                String metadata = this.wpsConnector.getProcessResult(r.getJobIdentifier(), "metadata");
+                CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
+                
+                if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
+                    LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getJobIdentifier());
+                    return;
+                }
+
                 WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
                 p.setSourceType(AbstractDataEnvelope.SourceTypeEnum.WACODISPRODUCTDATAENVELOPE);
                 p.setProductCollection(r.getProductCollection());
                 p.setCreated(new DateTime().toDateTime(DateTimeZone.UTC));
                 p.setModified(p.getCreated());
+                
                 p.setProductType(collProperties.getProductType());
                 p.setServiceName(collProperties.getServiceName());
-                p.setIdentifier(String.format("%s_%s", r.getProductCollection(), p.getCreated()));
+                p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
                 
-                AbstractDataEnvelopeTimeFrame tf = new AbstractDataEnvelopeTimeFrame();
-                tf.setEndTime(p.getCreated());
-                tf.setStartTime(p.getCreated());
-                p.setTimeFrame(tf);
+                // use the time frame and AoI of the original sentinel scene
+                p.setTimeFrame(metaEnvelope.getTimeFrame());
+                p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
 
                 streams.publishNewProductAvailable(p);                
             } else {
                 LOG.warn("No valid/referenced process outputs found for JobID '{}'", r.getJobIdentifier());
             }
-        } catch (IngestionException ex) {
+        } catch (IngestionException | IOException ex) {
             LOG.warn("Error on ingestion execution: " + ex.getMessage());
             LOG.debug("Error on ingestion execution: " + ex.getMessage(), ex);
         }

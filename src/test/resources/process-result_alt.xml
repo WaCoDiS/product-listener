@@ -1,0 +1,27 @@
+<wps:Result xmlns:wps="http://www.opengis.net/wps/2.0" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/2.0 http://schemas.opengis.net/wps/2.0/wps.xsd">
+  <wps:JobID>2dfe6333-1f08-4b1c-8d4e-cce21e55d15f</wps:JobID> 
+  <wps:ExpirationDate>2019-05-23T13:21:11.18317Z</wps:ExpirationDate> 
+  <wps:Output id="PRODUCT">
+    <wps:Reference xlink:href="localhost:8080/wps/results/2dfe6333-1f08-4b1c-8d4e-cce21e55d15f/PRODUCT" mimeType="image/geotiff"/>
+  </wps:Output>
+  <wps:Output id="METADATA">
+    <wps:Data mimeType="text/json" encoding="UTF-8">
+      <wps:LiteralValue dataType="w3.org/2001/XMLSchema-datatypes#string">{
+   "sourceType":"CopernicusDataEnvelope",
+   "areaOfInterest":{
+      "extent":[
+         51.0,
+         6.0,
+         52.0,
+         7.0
+      ]
+   },
+   "timeFrame":{
+      "startTime":"2019-05-15T10:36:43Z",
+      "endTime":"2019-05-15T10:36:57Z"
+   },
+   "datasetId":"20190515T103657_32UMB_0"
+}</wps:LiteralValue> 
+    </wps:Data> 
+  </wps:Output> 
+</wps:Result>

@@ -20,10 +20,12 @@ import org.n52.geoprocessing.wps.client.WPSClientSession;
 import org.n52.geoprocessing.wps.client.model.Result;
 import org.n52.geoprocessing.wps.client.model.execution.ComplexData;
 import org.n52.geoprocessing.wps.client.model.execution.Data;
+import org.n52.geoprocessing.wps.client.model.execution.LiteralData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -37,25 +39,36 @@ public class WpsConnectorImpl implements WpsConnector {
     
     private static final Logger LOG = LoggerFactory.getLogger(WpsConnectorImpl.class);
     
-    @Value("${product-listener.wps-base-url}")
     private String wpsBaseUrl;
     
     @Autowired
     private RestTemplate restTemplate;
+    
+    private WPSClientSession wpsSession;
+
+    @Value("${product-listener.wps-base-url}")
+    public void setWpsBaseUrl(String wpsBaseUrl) {
+        this.wpsBaseUrl = wpsBaseUrl;
+    }
+    
+    @Autowired
+    public void setWpsSession(WPSClientSession wpsSession) {
+        this.wpsSession = wpsSession;
+    }
+    
+    @Bean
+    public WPSClientSession wpsSession() {
+        return new WPSClientSession();
+    }
 
     @Override
     public List<Path> resolveProcessResult(String jobId, String... outputIdentifier) {
-        synchronized (this) {
-            WPSClientSession.reset();
-        }
-        
-        WPSClientSession session = WPSClientSession.getInstance();
         try {
-            Result result = session.retrieveProcessResult(this.wpsBaseUrl, jobId);
+            Result result = this.wpsSession.retrieveProcessResult(this.wpsBaseUrl, jobId);
             List<Path> resultingFiles = new ArrayList<>();
             
             for (String oi : outputIdentifier) {
-                Optional<Data> o = result.getOutputs().stream().filter(d -> oi.equals(d.getId())).findAny();
+                Optional<Data> o = result.getOutputs().stream().filter(d -> oi.equalsIgnoreCase(d.getId())).findAny();
                 if (o.isPresent()) {
                     resultingFiles.add(storeFile(o.get()));
                 }
@@ -113,6 +126,33 @@ public class WpsConnectorImpl implements WpsConnector {
         Files.copy(response.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
         
         return target;
+    }
+
+    @Override
+    public String getProcessResult(String jobId, String outputIdentifier) throws IOException {
+        try {
+            Result result = this.wpsSession.retrieveProcessResult(this.wpsBaseUrl, jobId);
+            
+            Optional<Data> o = result.getOutputs().stream().filter(d -> outputIdentifier.equalsIgnoreCase(d.getId())).findAny();
+            if (o.isPresent()) {
+                Data data = o.get();
+                
+                if (data instanceof ComplexData) {
+                    data.getValue();
+                    return data.getValue().toString();
+                } else if (data instanceof LiteralData) {
+                    LiteralData literal = (LiteralData) data;
+                    return literal.getValue().toString();
+                }
+                
+            }
+            
+        } catch (IOException | WPSClientException ex) {
+            LOG.warn("Could not process GetResult: " + ex.getMessage());
+            LOG.debug(ex.getMessage(), ex);
+        }
+        
+        throw new IOException("Could not resolve process job/output: " + jobId + "/" + outputIdentifier);
     }
     
 }
