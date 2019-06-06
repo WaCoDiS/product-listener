@@ -32,16 +32,17 @@ public class StreamBinder implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        LOG.info("StreamBinder started.");
         new Thread(() -> {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 LOG.warn(ex.getMessage());
             }
             ProductDescription dummyResult = new ProductDescription();
-            dummyResult.setProductCollection("EO:WACODIS:DAT:LAND-COVER-CLASSIFICATION");
-            dummyResult.setJobIdentifier("f1ba2902-8164-4c45-820a-cacd5bc5bf62");
-            dummyResult.setOutputIdentifiers(Collections.singletonList("result"));
+            dummyResult.setProductCollection("EO:WACODIS:DAT:S2A_RAW");
+            dummyResult.setJobIdentifier("fc3dc127-299c-4707-a059-2a70a770d35c");
+            dummyResult.setOutputIdentifiers(Collections.singletonList("PRODUCT"));
             onNewProcessResult(dummyResult);
         }).start();
     }

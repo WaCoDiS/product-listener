@@ -82,14 +82,6 @@ public class WpsConnectorImplTest {
         String result = conn.getProcessResult("asdf", "metadata");
         CopernicusDataEnvelope cde = new JsonDecoder().decodeFromJson(result, CopernicusDataEnvelope.class);
         
-        Assert.assertThat(cde.getDatasetId(), CoreMatchers.equalTo("20190515T103657_32UMB_0"));
-        
-        AbstractDataEnvelopeAreaOfInterest aoi = cde.getAreaOfInterest();
-        Assert.assertThat(aoi.getExtent().get(0), CoreMatchers.equalTo(51.0f));
-        Assert.assertThat(aoi.getExtent().get(1), CoreMatchers.equalTo(6.0f));
-        Assert.assertThat(aoi.getExtent().get(2), CoreMatchers.equalTo(52.0f));
-        Assert.assertThat(aoi.getExtent().get(3), CoreMatchers.equalTo(7.0f));
-        
         AbstractDataEnvelopeTimeFrame tf = cde.getTimeFrame();
         Assert.assertThat(tf.getStartTime(), CoreMatchers.equalTo(new DateTime("2019-05-15T10:36:43Z").toDateTime(DateTimeZone.UTC)));
         Assert.assertThat(tf.getEndTime(), CoreMatchers.equalTo(new DateTime("2019-05-15T10:36:57Z").toDateTime(DateTimeZone.UTC)));

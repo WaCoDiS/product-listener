@@ -10,11 +10,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.n52.geoprocessing.wps.client.WPSClientException;
 import org.n52.geoprocessing.wps.client.WPSClientSession;
 import org.n52.geoprocessing.wps.client.model.Result;
@@ -45,10 +51,17 @@ public class WpsConnectorImpl implements WpsConnector {
     private RestTemplate restTemplate;
     
     private WPSClientSession wpsSession;
+    
+    private String storageDirectory;
 
     @Value("${product-listener.wps-base-url}")
     public void setWpsBaseUrl(String wpsBaseUrl) {
         this.wpsBaseUrl = wpsBaseUrl;
+    }
+
+    @Value("${product-listener.file-storage-directory}")
+    public void setStorageDirectory(String storageDirectory) {
+        this.storageDirectory = storageDirectory;
     }
     
     @Autowired
@@ -115,6 +128,8 @@ public class WpsConnectorImpl implements WpsConnector {
             throw new IOException("Unsupported reference via HTTP POST");
         }
         
+        LOG.info("Downloading WPS result: {}", asUri);
+        
         // do the download
         Resource response = this.restTemplate.getForObject(asUri, Resource.class);
         
@@ -122,8 +137,12 @@ public class WpsConnectorImpl implements WpsConnector {
             throw new IOException("Could not download result from WPS.");
         }
         
-        Path target = Files.createTempFile("temp-", ".geotiff");
+        String fileNamePrefix = DateTime.now().toString(DateTimeFormat.forPattern("yyyyMMdd_HHmm"));
+        
+        Path target = Paths.get(this.storageDirectory).resolve(fileNamePrefix + ".geotiff");
         Files.copy(response.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        
+        LOG.info("Result stored to: {}", target);
         
         return target;
     }

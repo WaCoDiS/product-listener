@@ -97,7 +97,10 @@ public class NewProductHandler implements InitializingBean {
                 
                 // use the time frame and AoI of the original sentinel scene
                 p.setTimeFrame(metaEnvelope.getTimeFrame());
-                p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
+                
+                if (metaEnvelope.getAreaOfInterest() != null) {
+                    p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
+                }
 
                 streams.publishNewProductAvailable(p);                
             } else {

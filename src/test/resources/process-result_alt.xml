@@ -8,19 +8,10 @@
     <wps:Data mimeType="text/json" encoding="UTF-8">
       <wps:LiteralValue dataType="w3.org/2001/XMLSchema-datatypes#string">{
    "sourceType":"CopernicusDataEnvelope",
-   "areaOfInterest":{
-      "extent":[
-         51.0,
-         6.0,
-         52.0,
-         7.0
-      ]
-   },
    "timeFrame":{
       "startTime":"2019-05-15T10:36:43Z",
       "endTime":"2019-05-15T10:36:57Z"
-   },
-   "datasetId":"20190515T103657_32UMB_0"
+   }
 }</wps:LiteralValue> 
     </wps:Data> 
   </wps:Output> 

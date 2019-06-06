@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  *
  * @author matthes
  */
-@Component
+//@Component
 public class ArcPyBackend implements IngestionBackend, InitializingBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(ArcPyBackend.class);

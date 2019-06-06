@@ -1,0 +1,5 @@
+Dockerfile
+docker-compose.yml
+ui/dist
+ui/node_modules
+target

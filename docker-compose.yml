@@ -1,0 +1,11 @@
+version: "3"
+services:
+  product-listener:
+    build:
+      context: .
+    image: registry.wacodis.demo.52north.org/product-listener:2019-06-06
+    network_mode: "host"
+    environment:
+      - product-listener.file-storage-directory=/wacodis_data/
+    volumes:
+      - /media/matthes/daten/wacodis_data/:/wacodis_data/

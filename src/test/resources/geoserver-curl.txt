@@ -1,0 +1,4 @@
+curl -u "admin:geoserver" -XPUT -H 'Content-type: text/plain' \
+        -d "/wacodis_data/s2a_test_2.geotiff" \
+        "http://localhost:8080/geoserver/rest/workspaces/geotiff-ws/coveragestores/s2a_test_2/external.geotiff"
+
