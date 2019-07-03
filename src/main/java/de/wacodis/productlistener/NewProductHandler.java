@@ -92,7 +92,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                     }
 
                     // retrieve the metadata (i.e. the copernicus data envelope of the input product)
-                    String metadata = this.wpsConnector.getProcessResult(r.getJobIdentifier(), "metadata");
+                    String metadata = this.wpsConnector.getProcessResult(r.getJobIdentifier(), "METADATA");
                     CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
 
                     if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
