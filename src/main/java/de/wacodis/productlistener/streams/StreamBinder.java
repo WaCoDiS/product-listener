@@ -3,15 +3,12 @@ package de.wacodis.productlistener.streams;
 
 import de.wacodis.productlistener.NewProductHandler;
 import de.wacodis.productlistener.model.ProductDescription;
-import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.scheduling.annotation.Async;
 
 /**
  *
@@ -23,21 +20,12 @@ public class StreamBinder implements InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(StreamBinder.class.getName());
     
     @Autowired
-    private StreamChannels channels;
-    
-    @Autowired
     private NewProductHandler handler;
     
 
     @Override
     public void afterPropertiesSet() throws Exception {
         LOG.info("StreamBinder started.");
-    }
-    
-    @Async
-    public void publishNewProductAvailable(WacodisProductDataEnvelope p) {
-        channels.publishNewProduct().send(MessageBuilder.withPayload(p).build());
-        LOG.info("Published a new product availability: {}", p);
     }
     
     @StreamListener(StreamChannels.NEW_PROCESS_RESULT_AVAILABLE)

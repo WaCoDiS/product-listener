@@ -8,11 +8,10 @@ package de.wacodis.productlistener;
 import de.wacodis.productlistener.configuration.ProductListenerConfig;
 import de.wacodis.productlistener.decode.JsonDecoder;
 import de.wacodis.productlistener.model.AbstractDataEnvelope;
-import de.wacodis.productlistener.model.AbstractDataEnvelopeTimeFrame;
 import de.wacodis.productlistener.model.CopernicusDataEnvelope;
 import de.wacodis.productlistener.model.ProductDescription;
 import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
-import de.wacodis.productlistener.streams.StreamBinder;
+import de.wacodis.productlistener.streams.StreamChannels;
 import de.wacodis.productlistener.wps.WpsConnector;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -28,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,7 +45,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
     private WpsConnector wpsConnector;
     
     @Autowired
-    private StreamBinder streams;
+    private StreamChannels channels;
     
     @Autowired
     private JsonDecoder jsonDecoder;
@@ -117,7 +116,9 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                         p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
                     }
 
-                    streams.publishNewProductAvailable(p);                
+                    this.ingester.submit(() -> {
+                        publishNewProductAvailable(p);  
+                    });
                 } else {
                     LOG.warn("No valid/referenced process outputs found for JobID '{}'", r.getJobIdentifier());
                 }
@@ -127,6 +128,11 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
             }
         });
 
+    }
+    
+    public void publishNewProductAvailable(WacodisProductDataEnvelope p) {
+        channels.publishNewProduct().send(MessageBuilder.withPayload(p).build());
+        LOG.info("Published a new product availability: {}", p);
     }
     
 }
