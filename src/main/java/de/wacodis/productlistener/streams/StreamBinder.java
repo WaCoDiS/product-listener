@@ -4,7 +4,6 @@ package de.wacodis.productlistener.streams;
 import de.wacodis.productlistener.NewProductHandler;
 import de.wacodis.productlistener.model.ProductDescription;
 import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
-import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,18 +32,6 @@ public class StreamBinder implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         LOG.info("StreamBinder started.");
-        new Thread(() -> {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException ex) {
-                LOG.warn(ex.getMessage());
-            }
-            ProductDescription dummyResult = new ProductDescription();
-            dummyResult.setProductCollection("EO:WACODIS:DAT:S2A_RAW");
-            dummyResult.setJobIdentifier("fc3dc127-299c-4707-a059-2a70a770d35c");
-            dummyResult.setOutputIdentifiers(Collections.singletonList("PRODUCT"));
-            onNewProcessResult(dummyResult);
-        }).start();
     }
     
     @Async

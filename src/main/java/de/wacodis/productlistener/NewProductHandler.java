@@ -18,11 +18,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author matthes
  */
 @Component
-public class NewProductHandler implements InitializingBean {
+public class NewProductHandler implements InitializingBean, DisposableBean {
     
     private static final Logger LOG = LoggerFactory.getLogger(NewProductHandler.class);
     
@@ -52,11 +55,19 @@ public class NewProductHandler implements InitializingBean {
     private ProductlistenerApplication.AppConfiguration productCollectionMapping;
     
     private Map<String, ProductListenerConfig.ProductCollectionMappingConfig> collectionMapping;
+    private final ExecutorService ingester = Executors.newSingleThreadExecutor();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         this.collectionMapping = this.productCollectionMapping.getProductListener().getProductCollectionMappingAsMap();
     }
+
+    @Override
+    public void destroy() throws Exception {
+        this.ingester.shutdown();
+    }
+    
+    
     
     public void handleNewProduct(ProductDescription r) {
         if (!this.collectionMapping.containsKey(r.getProductCollection())) {
@@ -65,51 +76,57 @@ public class NewProductHandler implements InitializingBean {
             return;
         }
         
-        String[] asArray = new String[r.getOutputIdentifiers().size()];
-        asArray = r.getOutputIdentifiers().toArray(asArray);
-        List<Path> resultFiles = this.wpsConnector.resolveProcessResult(r.getJobIdentifier(), asArray);
-        
-        try {
-            if (resultFiles != null && !resultFiles.isEmpty()) {
-                ProductListenerConfig.ProductCollectionMappingConfig collProperties = this.collectionMapping.get(r.getProductCollection());
-                for (Path resultFile : resultFiles) {
-                    this.backend.ingestFileIntoCollection(resultFile, r.getProductCollection(), collProperties.getServiceName());
-                }
+        /*
+        * submit to executor
+        */
+        this.ingester.submit(() -> {
+            String[] asArray = new String[r.getOutputIdentifiers().size()];
+            asArray = r.getOutputIdentifiers().toArray(asArray);
+            List<Path> resultFiles = this.wpsConnector.resolveProcessResult(r.getJobIdentifier(), asArray);
 
-                // retrieve the metadata (i.e. the copernicus data envelope of the input product)
-                String metadata = this.wpsConnector.getProcessResult(r.getJobIdentifier(), "metadata");
-                CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
-                
-                if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
-                    LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getJobIdentifier());
-                    return;
-                }
+            try {
+                if (resultFiles != null && !resultFiles.isEmpty()) {
+                    ProductListenerConfig.ProductCollectionMappingConfig collProperties = this.collectionMapping.get(r.getProductCollection());
+                    for (Path resultFile : resultFiles) {
+                        this.backend.ingestFileIntoCollection(resultFile, r.getProductCollection(), collProperties.getServiceName());
+                    }
 
-                WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
-                p.setSourceType(AbstractDataEnvelope.SourceTypeEnum.WACODISPRODUCTDATAENVELOPE);
-                p.setProductCollection(r.getProductCollection());
-                p.setCreated(new DateTime().toDateTime(DateTimeZone.UTC));
-                p.setModified(p.getCreated());
-                
-                p.setProductType(collProperties.getProductType());
-                p.setServiceName(collProperties.getServiceName());
-                p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
-                
-                // use the time frame and AoI of the original sentinel scene
-                p.setTimeFrame(metaEnvelope.getTimeFrame());
-                
-                if (metaEnvelope.getAreaOfInterest() != null) {
-                    p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
-                }
+                    // retrieve the metadata (i.e. the copernicus data envelope of the input product)
+                    String metadata = this.wpsConnector.getProcessResult(r.getJobIdentifier(), "metadata");
+                    CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
 
-                streams.publishNewProductAvailable(p);                
-            } else {
-                LOG.warn("No valid/referenced process outputs found for JobID '{}'", r.getJobIdentifier());
+                    if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
+                        LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getJobIdentifier());
+                        return;
+                    }
+
+                    WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
+                    p.setSourceType(AbstractDataEnvelope.SourceTypeEnum.WACODISPRODUCTDATAENVELOPE);
+                    p.setProductCollection(r.getProductCollection());
+                    p.setCreated(new DateTime().toDateTime(DateTimeZone.UTC));
+                    p.setModified(p.getCreated());
+
+                    p.setProductType(collProperties.getProductType());
+                    p.setServiceName(collProperties.getServiceName());
+                    p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
+
+                    // use the time frame and AoI of the original sentinel scene
+                    p.setTimeFrame(metaEnvelope.getTimeFrame());
+
+                    if (metaEnvelope.getAreaOfInterest() != null) {
+                        p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
+                    }
+
+                    streams.publishNewProductAvailable(p);                
+                } else {
+                    LOG.warn("No valid/referenced process outputs found for JobID '{}'", r.getJobIdentifier());
+                }
+            } catch (IngestionException | IOException ex) {
+                LOG.warn("Error on ingestion execution: " + ex.getMessage());
+                LOG.debug("Error on ingestion execution: " + ex.getMessage(), ex);
             }
-        } catch (IngestionException | IOException ex) {
-            LOG.warn("Error on ingestion execution: " + ex.getMessage());
-            LOG.debug("Error on ingestion execution: " + ex.getMessage(), ex);
-        }
+        });
+
     }
     
 }

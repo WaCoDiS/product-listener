@@ -5,6 +5,7 @@
  */
 package de.wacodis.productlistener.wps;
 
+import de.wacodis.productlistener.WpsMetadataExecption;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,11 +17,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.logging.Level;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
 import org.n52.geoprocessing.wps.client.WPSClientException;
 import org.n52.geoprocessing.wps.client.WPSClientSession;
 import org.n52.geoprocessing.wps.client.model.Result;
@@ -73,7 +72,7 @@ public class WpsConnectorImpl implements WpsConnector {
     public WPSClientSession wpsSession() {
         return new WPSClientSession();
     }
-
+    
     @Override
     public List<Path> resolveProcessResult(String jobId, String... outputIdentifier) {
         try {
@@ -81,14 +80,22 @@ public class WpsConnectorImpl implements WpsConnector {
             List<Path> resultingFiles = new ArrayList<>();
             
             for (String oi : outputIdentifier) {
+                int retriesOnOutput = 0;
+                boolean outputRetrieved = false;
                 Optional<Data> o = result.getOutputs().stream().filter(d -> oi.equalsIgnoreCase(d.getId())).findAny();
-                if (o.isPresent()) {
-                    resultingFiles.add(storeFile(o.get()));
+                while (o.isPresent() && retriesOnOutput++ < 3 && !outputRetrieved) {
+                    try {
+                        resultingFiles.add(storeFile(o.get()));
+                        outputRetrieved = true;
+                    } catch (IOException ex) {
+                        LOG.warn("Could not retrieve process output: " + ex.getMessage());
+                        LOG.info("Number of tries for output {}: {}", oi, retriesOnOutput);
+                    }
                 }
             }
             
             return resultingFiles;
-        } catch (IOException | URISyntaxException | WPSClientException ex) {
+        } catch (WpsMetadataExecption | IOException | URISyntaxException | WPSClientException ex) {
             LOG.warn("Could not process GetResult: " + ex.getMessage());
             LOG.debug(ex.getMessage(), ex);
         }
@@ -96,7 +103,7 @@ public class WpsConnectorImpl implements WpsConnector {
         return Collections.emptyList();
     }
 
-    private Path storeFile(Data data) throws IOException, URISyntaxException {
+    private Path storeFile(Data data) throws WpsMetadataExecption, URISyntaxException, IOException {
         
         ComplexData complexData;
         if (data instanceof ComplexData) {
@@ -110,7 +117,7 @@ public class WpsConnectorImpl implements WpsConnector {
         if (complexData.getReference() != null && complexData.getReference().getHref() != null) {
             asUri = complexData.getReference().getHref().toURI();
         } else {
-            throw new IOException("Could not resolve reference of process output: " + complexData);
+            throw new WpsMetadataExecption("Could not resolve reference of process output: " + complexData);
         }
         
         // two cases can happen here:
@@ -120,12 +127,12 @@ public class WpsConnectorImpl implements WpsConnector {
         
         if (complexData.getReference().getBody() != null) {
             LOG.warn("A complex data with a POST body was found. This is currently not supported. POST body: " + complexData.getReference().getBody());
-            throw new IOException("Unsupported reference via HTTP POST");
+            throw new WpsMetadataExecption("Unsupported reference via HTTP POST");
         }
         
         if (complexData.getReference().getBodyReference() != null) {
             LOG.warn("A complex data with a reference to POST body was found. This is currently not supported. POST body: " + complexData.getReference().getBodyReference());
-            throw new IOException("Unsupported reference via HTTP POST");
+            throw new WpsMetadataExecption("Unsupported reference via HTTP POST");
         }
         
         LOG.info("Downloading WPS result: {}", asUri);
