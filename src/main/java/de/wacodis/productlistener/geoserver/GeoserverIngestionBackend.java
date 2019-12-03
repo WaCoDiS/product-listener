@@ -7,8 +7,10 @@ import java.nio.file.Path;
 import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -19,7 +21,8 @@ import org.springframework.web.client.RestTemplate;
  * @author Matthes Rieke <m.rieke@52north.org>
  */
 @Component
-public class GeoserverIngestionBackend implements IngestionBackend {
+@ConditionalOnProperty(value = "product-listener.geoserver.enabled", havingValue = "true")
+public class GeoserverIngestionBackend implements IngestionBackend, InitializingBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoserverIngestionBackend.class);
 
@@ -43,6 +46,11 @@ public class GeoserverIngestionBackend implements IngestionBackend {
     @Value("${product-listener.geoserver.password}")
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        LOG.info("Using GeoserverIngestionBackend at: {}", this.geoserverUrl);
     }
 
     @Override

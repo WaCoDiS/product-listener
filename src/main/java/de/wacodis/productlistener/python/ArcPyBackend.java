@@ -17,13 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author matthes
  */
-//@Component
+@Component
+@ConditionalOnProperty(value = "product-listener.imageserver.enabled", havingValue = "true")
 public class ArcPyBackend implements IngestionBackend, InitializingBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(ArcPyBackend.class);
@@ -55,7 +57,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         ProcessBuilder builder = new ProcessBuilder();
         String pythonScriptCommand = String.format("python %s %s %s",
                 this.pythonScript.toAbsolutePath().toString(),
-                resultFile.toAbsolutePath().toString(),
+                resultFile.toFile().getName(),
                 collectionId);
         if (isWindows) {
             builder.command("cmd.exe", "/c", pythonScriptCommand);

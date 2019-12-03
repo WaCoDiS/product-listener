@@ -29,6 +29,7 @@ product-listener:
   wps-base-url: https://wacodis.demo.52north.org/wacodis-wps/service
   file-storage-directory: /media/matthes/daten/wacodis_data/
   geoserver:
+    enabled: true
     location: http://localhost:8080/geoserver
     username: admin
     password: geoserver
