@@ -1,6 +1,7 @@
 
 package de.wacodis.productlistener.decode;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import java.io.IOException;
@@ -23,6 +24,10 @@ public class JsonDecoder {
     
     public <T> T decodeFromJson(String data, Class<T> clazz) throws IOException {
         return this.om.readValue(data, clazz);
+    }
+    
+    public <T> String encodeToJson(T data) throws JsonProcessingException {
+        return this.om.writeValueAsString(data);
     }
     
 }

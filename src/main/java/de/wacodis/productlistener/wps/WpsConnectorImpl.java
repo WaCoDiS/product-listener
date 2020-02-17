@@ -7,6 +7,8 @@ package de.wacodis.productlistener.wps;
 
 import de.wacodis.productlistener.WpsMetadataExecption;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -15,9 +17,17 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.n52.geoprocessing.wps.client.WPSClientException;
@@ -33,7 +43,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -47,7 +56,7 @@ public class WpsConnectorImpl implements WpsConnector {
     private String wpsBaseUrl;
     
     @Autowired
-    private RestTemplate restTemplate;
+    private CloseableHttpClient httpClient;
     
     private WPSClientSession wpsSession;
     
@@ -74,10 +83,10 @@ public class WpsConnectorImpl implements WpsConnector {
     }
     
     @Override
-    public List<Path> resolveProcessResult(String jobId, String... outputIdentifier) {
+    public Map<String, Path> resolveProcessResult(String jobId, String... outputIdentifier) {
         try {
             Result result = this.wpsSession.retrieveProcessResult(this.wpsBaseUrl, jobId);
-            List<Path> resultingFiles = new ArrayList<>();
+            Map<String, Path> resultingFiles = new HashMap<>();
             
             for (String oi : outputIdentifier) {
                 int retriesOnOutput = 0;
@@ -85,7 +94,7 @@ public class WpsConnectorImpl implements WpsConnector {
                 Optional<Data> o = result.getOutputs().stream().filter(d -> oi.equalsIgnoreCase(d.getId())).findAny();
                 while (o.isPresent() && retriesOnOutput++ < 3 && !outputRetrieved) {
                     try {
-                        resultingFiles.add(storeFile(o.get()));
+                        resultingFiles.put(oi, storeFile(o.get()));
                         outputRetrieved = true;
                     } catch (IOException ex) {
                         LOG.warn("Could not retrieve process output: " + ex.getMessage());
@@ -100,7 +109,7 @@ public class WpsConnectorImpl implements WpsConnector {
             LOG.debug(ex.getMessage(), ex);
         }
         
-        return Collections.emptyList();
+        return Collections.emptyMap();
     }
 
     private Path storeFile(Data data) throws WpsMetadataExecption, URISyntaxException, IOException {
@@ -137,17 +146,30 @@ public class WpsConnectorImpl implements WpsConnector {
         
         LOG.info("Downloading WPS result: {}", asUri);
         
-        // do the download
-        Resource response = this.restTemplate.getForObject(asUri, Resource.class);
-        
-        if (response == null) {
-            throw new IOException("Could not download result from WPS.");
-        }
-        
         String fileNamePrefix = DateTime.now().toString(DateTimeFormat.forPattern("yyyyMMdd_HHmm"));
+        Path target = Paths.get(this.storageDirectory).resolve(fileNamePrefix + ".tif");
+        HttpGet httpGet = new HttpGet(asUri);
         
-        Path target = Paths.get(this.storageDirectory).resolve(fileNamePrefix + ".geotiff");
-        Files.copy(response.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        // do the download
+        try (CloseableHttpResponse response = this.httpClient.execute(httpGet);
+                OutputStream fos = Files.newOutputStream(target);
+                InputStream is = response.getEntity().getContent();) {
+            
+            byte[] buf = new byte[1024];
+            int length;
+            long cycle = 0;
+            while( (length = is.read(buf)) != -1) {
+                 fos.write(buf);
+                 fos.flush();
+                 if (++cycle % (1000*1000*100) == 0) {
+                    LOG.debug("Downloaded {} mb", cycle * buf.length / (1000*1000));
+                }
+            }
+            
+            
+        } catch (Exception e) {
+            throw new IOException("Could not download result from WPS.", e);
+        }
         
         LOG.info("Result stored to: {}", target);
         

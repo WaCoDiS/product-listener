@@ -13,7 +13,7 @@ import java.nio.file.Path;
  */
 public interface IngestionBackend {
     
-    public void ingestFileIntoCollection(Path resultFile, String collectionId,
+    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId,
             String serviceName) throws IngestionException;
     
 }

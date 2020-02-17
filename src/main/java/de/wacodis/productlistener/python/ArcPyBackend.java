@@ -34,7 +34,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
     private String pythonScriptLocation;
     
     private Path pythonScript;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
     private boolean isWindows;
 
     @Override
@@ -52,13 +52,13 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
     }
 
     @Override
-    public void ingestFileIntoCollection(Path resultFile, String collectionId,
+    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId,
             String serviceName) throws IngestionException {
         ProcessBuilder builder = new ProcessBuilder();
         String pythonScriptCommand = String.format("python %s %s %s",
                 this.pythonScript.toAbsolutePath().toString(),
-                resultFile.toFile().getName(),
-                collectionId);
+                resultFile.toFile().getAbsolutePath(),
+                metadataFile.toFile().getAbsolutePath());
         if (isWindows) {
             builder.command("cmd.exe", "/c", pythonScriptCommand);
         } else {
@@ -71,11 +71,13 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         try {
             Process process = builder.start();
             ProcessStreamHandler handler = new ProcessStreamHandler(process.getInputStream(), this::logOutput);
+            ProcessStreamHandler errorHandler = new ProcessStreamHandler(process.getErrorStream(), this::logOutput);
             executor.submit(handler);
+            executor.submit(errorHandler);
             int exitCode = process.waitFor();
             
             if (exitCode != 0) {
-                LOG.warn("Python script ended with non-zero exit code: {}", exitCode);
+                throw new IngestionException("Python script ended with non-zero exit code: " + exitCode);
             }
         } catch (IOException | InterruptedException ex) {
             throw new IngestionException(ex.getMessage(), ex);

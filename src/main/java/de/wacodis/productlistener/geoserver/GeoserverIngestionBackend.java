@@ -54,7 +54,7 @@ public class GeoserverIngestionBackend implements IngestionBackend, Initializing
     }
 
     @Override
-    public void ingestFileIntoCollection(Path resultFile, String collectionId, String serviceName) throws IngestionException {
+    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId, String serviceName) throws IngestionException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/plain");
 
