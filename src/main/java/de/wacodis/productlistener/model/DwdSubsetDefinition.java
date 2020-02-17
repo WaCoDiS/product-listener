@@ -12,9 +12,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * DwdSubsetDefinition
+ * contains information for defining a subset definition for German weather service process inputs
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-05-21T12:49:26.085+02:00[Europe/Berlin]")
+@ApiModel(description = "contains information for defining a subset definition for German weather service process inputs")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-02-17T12:39:03.243+01:00[Europe/Berlin]")
 
 public class DwdSubsetDefinition extends AbstractSubsetDefinition implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -52,10 +53,10 @@ public class DwdSubsetDefinition extends AbstractSubsetDefinition implements Ser
   }
 
   /**
-   * the name of the queried layer
+   * the name of the queried layer 
    * @return layerName
   **/
-  @ApiModelProperty(required = true, value = "the name of the queried layer")
+  @ApiModelProperty(required = true, value = "the name of the queried layer ")
   @NotNull
 
 

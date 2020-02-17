@@ -4,53 +4,43 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import de.wacodis.productlistener.model.AbstractBackend;
 import de.wacodis.productlistener.model.AbstractDataEnvelope;
 import de.wacodis.productlistener.model.AbstractDataEnvelopeAreaOfInterest;
 import de.wacodis.productlistener.model.AbstractDataEnvelopeTimeFrame;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import org.joda.time.DateTime;
 import java.io.Serializable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * WacodisProductDataEnvelope
+ * describes specific metadata information about a product dataset created from the WaCoDiS System
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-05-21T12:49:26.085+02:00[Europe/Berlin]")
+@ApiModel(description = "describes specific metadata information about a product dataset created from the WaCoDiS System")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-02-17T12:39:03.243+01:00[Europe/Berlin]")
 
 public class WacodisProductDataEnvelope extends AbstractDataEnvelope implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  @JsonProperty("productCollection")
-  private String productCollection = null;
-
   @JsonProperty("productType")
   private String productType = null;
 
-  @JsonProperty("serviceName")
-  private String serviceName = null;
+  @JsonProperty("dataEnvelopeReferences")
+  @Valid
+  private List<String> dataEnvelopeReferences = new ArrayList<String>();
 
-  public WacodisProductDataEnvelope productCollection(String productCollection) {
-    this.productCollection = productCollection;
-    return this;
-  }
+  @JsonProperty("dataEnvelopeServiceEndpoint")
+  private String dataEnvelopeServiceEndpoint = null;
 
-  /**
-   * collection to which the new product is part of 
-   * @return productCollection
-  **/
-  @ApiModelProperty(required = true, value = "collection to which the new product is part of ")
-  @NotNull
+  @JsonProperty("process")
+  private String process = null;
 
-
-  public String getProductCollection() {
-    return productCollection;
-  }
-
-  public void setProductCollection(String productCollection) {
-    this.productCollection = productCollection;
-  }
+  @JsonProperty("serviceDefinition")
+  private AbstractBackend serviceDefinition = null;
 
   public WacodisProductDataEnvelope productType(String productType) {
     this.productType = productType;
@@ -73,25 +63,93 @@ public class WacodisProductDataEnvelope extends AbstractDataEnvelope implements 
     this.productType = productType;
   }
 
-  public WacodisProductDataEnvelope serviceName(String serviceName) {
-    this.serviceName = serviceName;
+  public WacodisProductDataEnvelope dataEnvelopeReferences(List<String> dataEnvelopeReferences) {
+    this.dataEnvelopeReferences = dataEnvelopeReferences;
+    return this;
+  }
+
+  public WacodisProductDataEnvelope addDataEnvelopeReferencesItem(String dataEnvelopeReferencesItem) {
+    this.dataEnvelopeReferences.add(dataEnvelopeReferencesItem);
     return this;
   }
 
   /**
-   * the reference to the service (e.g. Image Server name) 
-   * @return serviceName
+   * array of identifiers that reference data envelopes the WaCoDiS product results from 
+   * @return dataEnvelopeReferences
   **/
-  @ApiModelProperty(required = true, value = "the reference to the service (e.g. Image Server name) ")
+  @ApiModelProperty(required = true, value = "array of identifiers that reference data envelopes the WaCoDiS product results from ")
   @NotNull
 
 
-  public String getServiceName() {
-    return serviceName;
+  public List<String> getDataEnvelopeReferences() {
+    return dataEnvelopeReferences;
   }
 
-  public void setServiceName(String serviceName) {
-    this.serviceName = serviceName;
+  public void setDataEnvelopeReferences(List<String> dataEnvelopeReferences) {
+    this.dataEnvelopeReferences = dataEnvelopeReferences;
+  }
+
+  public WacodisProductDataEnvelope dataEnvelopeServiceEndpoint(String dataEnvelopeServiceEndpoint) {
+    this.dataEnvelopeServiceEndpoint = dataEnvelopeServiceEndpoint;
+    return this;
+  }
+
+  /**
+   * contains the url of the service endpoint to retrieve DataEnvelopes that are included in the dataEnvelopeReferences attribute, for example http://localhost:8080/dataenvelopes/ (without the id) 
+   * @return dataEnvelopeServiceEndpoint
+  **/
+  @ApiModelProperty(value = "contains the url of the service endpoint to retrieve DataEnvelopes that are included in the dataEnvelopeReferences attribute, for example http://localhost:8080/dataenvelopes/ (without the id) ")
+
+
+  public String getDataEnvelopeServiceEndpoint() {
+    return dataEnvelopeServiceEndpoint;
+  }
+
+  public void setDataEnvelopeServiceEndpoint(String dataEnvelopeServiceEndpoint) {
+    this.dataEnvelopeServiceEndpoint = dataEnvelopeServiceEndpoint;
+  }
+
+  public WacodisProductDataEnvelope process(String process) {
+    this.process = process;
+    return this;
+  }
+
+  /**
+   * name of the process that was responsible for creating the product 
+   * @return process
+  **/
+  @ApiModelProperty(required = true, value = "name of the process that was responsible for creating the product ")
+  @NotNull
+
+
+  public String getProcess() {
+    return process;
+  }
+
+  public void setProcess(String process) {
+    this.process = process;
+  }
+
+  public WacodisProductDataEnvelope serviceDefinition(AbstractBackend serviceDefinition) {
+    this.serviceDefinition = serviceDefinition;
+    return this;
+  }
+
+  /**
+   * Get serviceDefinition
+   * @return serviceDefinition
+  **/
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+  @Valid
+
+  public AbstractBackend getServiceDefinition() {
+    return serviceDefinition;
+  }
+
+  public void setServiceDefinition(AbstractBackend serviceDefinition) {
+    this.serviceDefinition = serviceDefinition;
   }
 
 
@@ -104,15 +162,17 @@ public class WacodisProductDataEnvelope extends AbstractDataEnvelope implements 
       return false;
     }
     WacodisProductDataEnvelope wacodisProductDataEnvelope = (WacodisProductDataEnvelope) o;
-    return Objects.equals(this.productCollection, wacodisProductDataEnvelope.productCollection) &&
-        Objects.equals(this.productType, wacodisProductDataEnvelope.productType) &&
-        Objects.equals(this.serviceName, wacodisProductDataEnvelope.serviceName) &&
+    return Objects.equals(this.productType, wacodisProductDataEnvelope.productType) &&
+        Objects.equals(this.dataEnvelopeReferences, wacodisProductDataEnvelope.dataEnvelopeReferences) &&
+        Objects.equals(this.dataEnvelopeServiceEndpoint, wacodisProductDataEnvelope.dataEnvelopeServiceEndpoint) &&
+        Objects.equals(this.process, wacodisProductDataEnvelope.process) &&
+        Objects.equals(this.serviceDefinition, wacodisProductDataEnvelope.serviceDefinition) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(productCollection, productType, serviceName, super.hashCode());
+    return Objects.hash(productType, dataEnvelopeReferences, dataEnvelopeServiceEndpoint, process, serviceDefinition, super.hashCode());
   }
 
   @Override
@@ -120,9 +180,11 @@ public class WacodisProductDataEnvelope extends AbstractDataEnvelope implements 
     StringBuilder sb = new StringBuilder();
     sb.append("class WacodisProductDataEnvelope {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    productCollection: ").append(toIndentedString(productCollection)).append("\n");
     sb.append("    productType: ").append(toIndentedString(productType)).append("\n");
-    sb.append("    serviceName: ").append(toIndentedString(serviceName)).append("\n");
+    sb.append("    dataEnvelopeReferences: ").append(toIndentedString(dataEnvelopeReferences)).append("\n");
+    sb.append("    dataEnvelopeServiceEndpoint: ").append(toIndentedString(dataEnvelopeServiceEndpoint)).append("\n");
+    sb.append("    process: ").append(toIndentedString(process)).append("\n");
+    sb.append("    serviceDefinition: ").append(toIndentedString(serviceDefinition)).append("\n");
     sb.append("}");
     return sb.toString();
   }

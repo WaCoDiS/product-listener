@@ -13,9 +13,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * AbstractSubsetDefinition
+ * abstract type for job input subsets
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-05-21T12:49:26.085+02:00[Europe/Berlin]")
+@ApiModel(description = "abstract type for job input subsets")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-02-17T12:39:03.243+01:00[Europe/Berlin]")
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "sourceType", visible = true)
 @JsonSubTypes({
@@ -23,6 +24,8 @@ import javax.validation.constraints.*;
   @JsonSubTypes.Type(value = CopernicusSubsetDefinition.class, name = "CopernicusSubsetDefinition"),
   @JsonSubTypes.Type(value = CatalogueSubsetDefinition.class, name = "CatalogueSubsetDefinition"),
   @JsonSubTypes.Type(value = DwdSubsetDefinition.class, name = "DwdSubsetDefinition"),
+  @JsonSubTypes.Type(value = WacodisProductSubsetDefinition.class, name = "WacodisProductSubsetDefinition"),
+  @JsonSubTypes.Type(value = StaticSubsetDefinition.class, name = "StaticSubsetDefinition"),
 })
 
 public class AbstractSubsetDefinition  implements Serializable {
@@ -38,7 +41,11 @@ public class AbstractSubsetDefinition  implements Serializable {
     
     CATALOGUESUBSETDEFINITION("CatalogueSubsetDefinition"),
     
-    DWDSUBSETDEFINITION("DwdSubsetDefinition");
+    DWDSUBSETDEFINITION("DwdSubsetDefinition"),
+    
+    STATICSUBSETDEFINITION("StaticSubsetDefinition"),
+    
+    WACODISPRODUCTSUBSETDEFINITION("WacodisProductSubsetDefinition");
 
     private String value;
 

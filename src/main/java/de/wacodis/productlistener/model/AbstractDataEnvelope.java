@@ -16,9 +16,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * AbstractDataEnvelope
+ * abstract type that describes basic metadata information about a dataset 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-05-21T12:49:26.085+02:00[Europe/Berlin]")
+@ApiModel(description = "abstract type that describes basic metadata information about a dataset ")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-02-17T12:39:03.243+01:00[Europe/Berlin]")
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "sourceType", visible = true)
 @JsonSubTypes({
@@ -33,7 +34,7 @@ public class AbstractDataEnvelope  implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * shall be used to determine the responsible data backend 
+   * shall be used to determine the responsible data envelope 
    */
   public enum SourceTypeEnum {
     SENSORWEBDATAENVELOPE("SensorWebDataEnvelope"),
@@ -93,10 +94,10 @@ public class AbstractDataEnvelope  implements Serializable {
   }
 
   /**
-   * shall be used to determine the responsible data backend 
+   * shall be used to determine the responsible data envelope 
    * @return sourceType
   **/
-  @ApiModelProperty(required = true, value = "shall be used to determine the responsible data backend ")
+  @ApiModelProperty(required = true, value = "shall be used to determine the responsible data envelope ")
   @NotNull
 
 

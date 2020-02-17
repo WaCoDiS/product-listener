@@ -2,14 +2,16 @@ package de.wacodis.productlistener.model;
 
 import java.util.Objects;
 import de.wacodis.productlistener.model.AbstractResource;
+import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * GetResource
+ * resource that can be fetched with a HTTP GET request
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2019-05-21T12:49:26.085+02:00[Europe/Berlin]")
+@ApiModel(description = "resource that can be fetched with a HTTP GET request")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-02-17T12:39:03.243+01:00[Europe/Berlin]")
 
 public class GetResource extends AbstractResource implements Serializable {
   private static final long serialVersionUID = 1L;
