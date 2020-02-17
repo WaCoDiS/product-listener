@@ -20,9 +20,9 @@
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
         <springfox-version>2.9.2</springfox-version>
-        <wps-client-lib.version>1.0.4-SNAPSHOT</wps-client-lib.version>
+        <wps-client-lib.version>1.0.4</wps-client-lib.version>
+        <app.finalName>${project.artifactId}-${project.version}</app.finalName>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -65,7 +65,7 @@
         
         <dependency>
             <groupId>org.n52.geoprocessing</groupId>
-            <artifactId>wps-client-lib</artifactId>
+            <artifactId>wps-client-lib-wacodis</artifactId>
             <version>${wps-client-lib.version}</version>
         </dependency>
 
@@ -100,6 +100,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>${app.finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -130,7 +131,7 @@
                                         <artifactItem>
                                             <groupId>de.wacodis</groupId>
                                             <artifactId>openapi</artifactId>
-                                            <version>0.0.1-SNAPSHOT</version>
+                                            <version>1.0.0</version>
                                             <type>jar</type>
                                             <includes>definitions/wacodis-schemas.yml</includes>
                                             <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
@@ -173,7 +174,7 @@
                 <dependency>
                     <groupId>de.wacodis</groupId>
                     <artifactId>openapi</artifactId>
-                    <version>0.0.1-SNAPSHOT</version>
+                    <version>1.0.0</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openapitools</groupId>
