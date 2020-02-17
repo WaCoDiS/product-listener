@@ -7,7 +7,9 @@ package de.wacodis.productlistener;
 
 import de.wacodis.productlistener.configuration.ProductListenerConfig;
 import de.wacodis.productlistener.decode.JsonDecoder;
+import de.wacodis.productlistener.model.AbstractBackend;
 import de.wacodis.productlistener.model.AbstractDataEnvelope;
+import de.wacodis.productlistener.model.ArcGISImageServerBackend;
 import de.wacodis.productlistener.model.CopernicusDataEnvelope;
 import de.wacodis.productlistener.model.ProductDescription;
 import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
@@ -91,24 +93,24 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
         this.ingester.submit(() -> {
             String[] asArray = new String[r.getOutputIdentifiers().size()];
             asArray = r.getOutputIdentifiers().toArray(asArray);
-            Map<String, Path> resultFiles = this.wpsConnector.resolveProcessResult(r.getJobIdentifier(), asArray);
+            Map<String, Path> resultFiles = this.wpsConnector.resolveProcessResult(r.getWpsJobIdentifier(), asArray);
 
             if (resultFiles != null && !resultFiles.isEmpty()) {
                 try {
                     ProductListenerConfig.ProductCollectionMappingConfig collProperties = this.collectionMapping.get(r.getProductCollection());
                     
                     // retrieve the metadata (i.e. the copernicus data envelope of the input product)
-                    String metadata = this.wpsConnector.getProcessResult(r.getJobIdentifier(), "METADATA");
+                    String metadata = this.wpsConnector.getProcessResult(r.getWpsJobIdentifier(), "METADATA");
                     
                     if (metadata == null || metadata.isEmpty()) {
-                        LOG.warn("The process result did not provide a metadata output: {}", r.getJobIdentifier());
+                        LOG.warn("The process result did not provide a metadata output: {}", r.getWpsJobIdentifier());
                         return;
                     }
                     
                     CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
                     
                     if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
-                        LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getJobIdentifier());
+                        LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getWpsJobIdentifier());
                         return;
                     }
                     
@@ -120,12 +122,17 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                 try {
                                     WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
                                     p.setSourceType(AbstractDataEnvelope.SourceTypeEnum.WACODISPRODUCTDATAENVELOPE);
-                                    p.setProductCollection(r.getProductCollection());
+                                    p.setProductType(r.getProductCollection());
                                     p.setCreated(new DateTime().toDateTime(DateTimeZone.UTC));
                                     p.setModified(p.getCreated());
                                     
                                     p.setProductType(collProperties.getProductType());
-                                    p.setServiceName(collProperties.getServiceName());
+
+                                    ArcGISImageServerBackend backendDef = new ArcGISImageServerBackend();
+                                    backendDef.setBaseUrl(collProperties.getServiceName());
+                                    backendDef.setProductCollection(collProperties.getProductType());
+
+                                    p.setServiceDefinition(backendDef);
                                     p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
                                     
                                     // use the time frame and AoI of the original sentinel scene
@@ -135,7 +142,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                         p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
                                     }
                                     
-                                    Path metaFile = Paths.get(this.storageDirectory).resolve(r.getJobIdentifier() + ".meta");
+                                    Path metaFile = Paths.get(this.storageDirectory).resolve(r.getWpsJobIdentifier() + ".meta");
                                     Files.write(metaFile, this.jsonDecoder.encodeToJson(p).getBytes());
                                     
                                     this.backend.ingestFileIntoCollection(resultFile, metaFile, r.getProductCollection(), collProperties.getServiceName());
@@ -154,7 +161,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                 }
 
             } else {
-                LOG.warn("No valid/referenced process outputs found for JobID '{}'", r.getJobIdentifier());
+                LOG.warn("No valid/referenced process outputs found for JobID '{}'", r.getWpsJobIdentifier());
             }
 
         });
