@@ -23,6 +23,14 @@
         <wps-client-lib.version>1.0.4</wps-client-lib.version>
         <app.finalName>${project.artifactId}-${project.version}</app.finalName>
     </properties>
+
+    <scm>
+		<url>https://github.com/WaCoDiS/product-listener</url>
+		<connection>scm:git:git://github.com/WaCoDiS/product-listener.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/WaCoDiS/product-listener.git</developerConnection>
+		<tag>v1.0.0</tag>
+	</scm>
+    
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
