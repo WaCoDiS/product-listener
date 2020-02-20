@@ -3,6 +3,7 @@ package de.wacodis.productlistener.streams;
 
 import de.wacodis.productlistener.NewProductHandler;
 import de.wacodis.productlistener.model.ProductDescription;
+import de.wacodis.productlistener.model.WacodisJobFinished;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,9 +30,11 @@ public class StreamBinder implements InitializingBean {
     }
     
     @StreamListener(StreamChannels.NEW_PROCESS_RESULT_AVAILABLE)
-    public void onNewProcessResult(ProductDescription r) {
-        LOG.info("New process result available: {}", r);
-        this.handler.handleNewProduct(r);
+    public void onNewProcessResult(WacodisJobFinished jobFinishedMsg) {
+        LOG.info("New process result available: {}", jobFinishedMsg);
+        
+        ProductDescription pd = jobFinishedMsg.getProductDescription();
+        this.handler.handleNewProduct(pd);
     }
     
 }
