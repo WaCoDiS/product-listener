@@ -61,10 +61,20 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
     @Autowired
     private ProductlistenerApplication.AppConfiguration productCollectionMapping;
     private String storageDirectory;
-    
+    private String dataAccessGetDataEnvelopeEndpoint;
+
     @Value("${product-listener.file-storage-directory}")
     public void setStorageDirectory(String storageDirectory) {
         this.storageDirectory = storageDirectory;
+    }
+
+    public String getDataAccessGetDataEnvelopeEndpoint() {
+        return dataAccessGetDataEnvelopeEndpoint;
+    }
+
+    @Value("${product-listener.dataAccessGetDataEnvelopeEndpoint}")
+    public void setDataAccessGetDataEnvelopeEndpoint(String dataAccessGetDataEnvelopeEndpoint) {
+        this.dataAccessGetDataEnvelopeEndpoint = dataAccessGetDataEnvelopeEndpoint;
     }
 
     private Map<String, ProductListenerConfig.ProductCollectionMappingConfig> collectionMapping;
@@ -98,35 +108,36 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
             if (resultFiles != null && !resultFiles.isEmpty()) {
                 try {
                     ProductListenerConfig.ProductCollectionMappingConfig collProperties = this.collectionMapping.get(r.getProductCollection());
-                    
+
                     // retrieve the metadata (i.e. the copernicus data envelope of the input product)
                     String metadata = this.wpsConnector.getProcessResult(r.getWpsJobIdentifier(), "METADATA");
-                    
+
                     if (metadata == null || metadata.isEmpty()) {
                         LOG.warn("The process result did not provide a metadata output: {}", r.getWpsJobIdentifier());
                         return;
                     }
-                    
+
                     CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
-                    
+
                     if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
                         LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getWpsJobIdentifier());
                         return;
                     }
-                    
+
                     resultFiles.keySet().stream()
                             .filter(k -> !k.equalsIgnoreCase("metadata"))
                             .forEach(k -> {
                                 Path resultFile = resultFiles.get(k);
-                                
+
                                 try {
                                     WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
                                     p.setSourceType(AbstractDataEnvelope.SourceTypeEnum.WACODISPRODUCTDATAENVELOPE);
                                     p.setProductType(r.getProductCollection());
                                     p.setCreated(new DateTime().toDateTime(DateTimeZone.UTC));
                                     p.setModified(p.getCreated());
-                                    
-                                    p.setProductType(collProperties.getProductType());
+                                    p.setProductType(collProperties.getProductType()); //productType is set twice with different parameters! Which value is correct?
+                                    p.setDataEnvelopeReferences(r.getDataEnvelopeReferences());
+                                    p.setDataEnvelopeServiceEndpoint(this.dataAccessGetDataEnvelopeEndpoint);
 
                                     ArcGISImageServerBackend backendDef = new ArcGISImageServerBackend();
                                     backendDef.setBaseUrl(collProperties.getServiceName());
@@ -137,16 +148,16 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     
                                     // use the time frame and AoI of the original sentinel scene
                                     p.setTimeFrame(metaEnvelope.getTimeFrame());
-                                    
+
                                     if (metaEnvelope.getAreaOfInterest() != null) {
                                         p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
                                     }
-                                    
+
                                     Path metaFile = Paths.get(this.storageDirectory).resolve(r.getWpsJobIdentifier() + ".meta");
                                     Files.write(metaFile, this.jsonDecoder.encodeToJson(p).getBytes());
-                                    
+
                                     this.backend.ingestFileIntoCollection(resultFile, metaFile, r.getProductCollection(), collProperties.getServiceName());
-                                    
+
                                     this.ingester.submit(() -> {
                                         publishNewProductAvailable(p);
                                     });

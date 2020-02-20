@@ -28,6 +28,7 @@ product-listener:
   python-script-location: /home/matthes/git/wacodis/product-listener/src/test/resources/dummy-ingestion.py
   wps-base-url: https://wacodis.demo.52north.org/wacodis-wps/service
   file-storage-directory: /media/matthes/daten/wacodis_data/
+  dataAccessGetDataEnvelopeEndpoint: localhost:8081/dataAccess/dataenvelopes
   geoserver:
     enabled: true
     location: http://localhost:8080/geoserver
