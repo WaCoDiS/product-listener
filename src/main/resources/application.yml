@@ -29,15 +29,16 @@ product-listener:
   file-storage-directory: /media/matthes/daten/wacodis_data/
   dataAccessGetDataEnvelopeEndpoint: localhost:8081/dataAccess/dataenvelopes
   geoserver:
-    enabled: false
-    location: http://localhost:8080/geoserver
+    enabled: true
+    url: http://localhost:8080/geoserver
+    service-type: WMS
     username: admin
     password: geoserver
   arcgis-image-server:
-    enabled: true
+    enabled: false
     python-script-location: /home/dummy-ingestion.py
     url: arcgis.server.url/arcgis/admin
-    service-types: ImageServer, WmsServer
+    service-type: ImageServer
   product-collection-mapping:
     - product-collection: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
       product-type: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition

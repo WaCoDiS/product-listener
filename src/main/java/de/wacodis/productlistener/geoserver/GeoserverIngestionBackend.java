@@ -32,12 +32,18 @@ public class GeoserverIngestionBackend implements IngestionBackend, Initializing
     private RestTemplate restTemplate;
 
     private String geoserverUrl;
+    private String serviceType;
     private String username;
     private String password;
 
-    @Value("${product-listener.geoserver.location}")
-    public void setGeoserverUrl(String geoserverUrl) {
-        this.geoserverUrl = geoserverUrl;
+    @Value("${product-listener.geoserver.url}")
+    public void setGeoserverUrl(String url) {
+        this.geoserverUrl = url;
+    }
+
+    @Value("${product-listener.geoserver.service-type}")
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     @Value("${product-listener.geoserver.username}")

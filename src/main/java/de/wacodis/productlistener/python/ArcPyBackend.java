@@ -38,7 +38,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(ArcPyBackend.class);
 
     private String arcgisImageServerUrl;
-    private String[] serviceTypes;
+    private String serviceType;
 
     @Value("${product-listener.arcgis-image-server.python-script-location}")
     private String pythonScriptLocation;
@@ -48,9 +48,9 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         this.arcgisImageServerUrl = url;
     }
 
-    @Value("${product-listener.arcgis-image-server.service-types}")
-    public void setServiceTypes(String[] serviceTypes) {
-        this.serviceTypes = serviceTypes;
+    @Value("${product-listener.arcgis-image-server.service-type}")
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     private Path pythonScript;
@@ -108,7 +108,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         ArcGISImageServerBackend backend = new ArcGISImageServerBackend();
         backend.setBackendType(ProductBackend.ARCGISIMAGESERVERBACKEND);
         backend.setBaseUrl(this.arcgisImageServerUrl);
-        backend.setServiceTypes(Arrays.asList(this.serviceTypes));
+        backend.setServiceTypes(Arrays.asList(this.serviceType));
         backend.setProductCollection(String.join("/", WACODIS_SERVICE_FOLDER, collectionId));
         return backend;
     }
