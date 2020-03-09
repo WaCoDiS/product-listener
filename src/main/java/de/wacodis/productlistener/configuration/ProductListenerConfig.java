@@ -58,10 +58,16 @@ public class ProductListenerConfig {
     }
     
     public static class ProductCollectionMappingConfig {
-        
+
+        /**
+         * Matches the productCollection parameter from WacodisJobDefinition
+         */
         private String productCollection;
+
+        /**
+         * Matches the resulting collection within the service backend
+         */
         private String productType;
-        private String serviceName;
 
         public String getProductCollection() {
             return productCollection;
@@ -77,14 +83,6 @@ public class ProductListenerConfig {
 
         public void setProductType(String productType) {
             this.productType = productType;
-        }
-
-        public String getServiceName() {
-            return serviceName;
-        }
-
-        public void setServiceName(String serviceName) {
-            this.serviceName = serviceName;
         }
         
     }

@@ -25,14 +25,27 @@ import org.springframework.stereotype.Component;
  * @author matthes
  */
 @Component
-@ConditionalOnProperty(value = "product-listener.imageserver.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "product-listener.arcgis-image-server.enabled", havingValue = "true")
 public class ArcPyBackend implements IngestionBackend, InitializingBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(ArcPyBackend.class);
 
-    @Value("${product-listener.python-script-location}")
+    private String arcgisImageServerUrl;
+    private String[] serviceTypes;
+
+    @Value("${product-listener.arcgis-image-server.python-script-location}")
     private String pythonScriptLocation;
-    
+
+    @Value("${product-listener.arcgis-image-server.url}")
+    public void setGeoserverUrl(String url) {
+        this.arcgisImageServerUrl = url;
+    }
+
+    @Value("${product-listener.arcgis-image-server.service-types}")
+    public void setServiceTypes(String[] serviceTypes) {
+        this.serviceTypes = serviceTypes;
+    }
+
     private Path pythonScript;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private boolean isWindows;

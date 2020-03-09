@@ -25,19 +25,21 @@ spring:
     username: rabbitmq
     password: rabbitmq
 product-listener:
-  python-script-location: /home/matthes/git/wacodis/product-listener/src/test/resources/dummy-ingestion.py
   wps-base-url: https://wacodis.demo.52north.org/wacodis-wps/service
   file-storage-directory: /media/matthes/daten/wacodis_data/
   dataAccessGetDataEnvelopeEndpoint: localhost:8081/dataAccess/dataenvelopes
   geoserver:
-    enabled: true
+    enabled: false
     location: http://localhost:8080/geoserver
     username: admin
     password: geoserver
+  arcgis-image-server:
+    enabled: true
+    python-script-location: /home/dummy-ingestion.py
+    url: arcgis.server.url/arcgis/admin
+    service-types: ImageServer, WmsServer
   product-collection-mapping:
-    - product-collection: EO:WACODIS:DAT:S2A_RAW
-      product-type: sentinel-2_level-1c
-      service-name: s2a
+    - product-collection: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
+      product-type: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition
     - product-collection: EO:WACODIS:DAT:NDVI
       product-type: ndvi
-      service-name: wacodis/ndvi/ImageServer
