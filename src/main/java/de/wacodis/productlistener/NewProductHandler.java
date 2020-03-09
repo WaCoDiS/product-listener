@@ -7,14 +7,10 @@ package de.wacodis.productlistener;
 
 import de.wacodis.productlistener.configuration.ProductListenerConfig;
 import de.wacodis.productlistener.decode.JsonDecoder;
-import de.wacodis.productlistener.model.AbstractBackend;
-import de.wacodis.productlistener.model.AbstractDataEnvelope;
-import de.wacodis.productlistener.model.ArcGISImageServerBackend;
-import de.wacodis.productlistener.model.CopernicusDataEnvelope;
-import de.wacodis.productlistener.model.ProductDescription;
-import de.wacodis.productlistener.model.WacodisProductDataEnvelope;
+import de.wacodis.productlistener.model.*;
 import de.wacodis.productlistener.streams.StreamChannels;
 import de.wacodis.productlistener.wps.WpsConnector;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -38,7 +35,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 /**
- *
  * @author matthes
  */
 @Component
@@ -98,7 +94,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
         }
 
         /*
-        * submit to executor
+         * submit to executor
          */
         this.ingester.submit(() -> {
             String[] asArray = new String[r.getOutputIdentifiers().size()];
@@ -117,7 +113,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                         return;
                     }
 
-                    CopernicusDataEnvelope metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, CopernicusDataEnvelope.class);
+                    ProcessingMetadata metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, ProcessingMetadata.class);
 
                     if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
                         LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getWpsJobIdentifier());
@@ -133,21 +129,17 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
                                     p.setSourceType(AbstractDataEnvelope.SourceTypeEnum.WACODISPRODUCTDATAENVELOPE);
                                     p.setProductType(r.getProductCollection());
-                                    p.setCreated(new DateTime().toDateTime(DateTimeZone.UTC));
-                                    p.setModified(p.getCreated());
-                                    p.setProductType(collProperties.getProductType()); //productType is set twice with different parameters! Which value is correct?
                                     p.setDataEnvelopeReferences(r.getDataEnvelopeReferences());
                                     p.setDataEnvelopeServiceEndpoint(this.dataAccessGetDataEnvelopeEndpoint);
 
-                                    ArcGISImageServerBackend backendDef = new ArcGISImageServerBackend();
-                                    backendDef.setBaseUrl(collProperties.getServiceName());
-                                    backendDef.setProductCollection(collProperties.getProductType());
-
+                                    AbstractBackend backendDef = backend.getServiceBackend(collProperties.getProductCollection());
                                     p.setServiceDefinition(backendDef);
                                     p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
-                                    
-                                    // use the time frame and AoI of the original sentinel scene
+
+                                    // use the time frame, AoI and creation timestamp of process result
                                     p.setTimeFrame(metaEnvelope.getTimeFrame());
+                                    p.setCreated(metaEnvelope.getCreated());
+                                    p.setModified(p.getCreated());
 
                                     if (metaEnvelope.getAreaOfInterest() != null) {
                                         p.setAreaOfInterest(metaEnvelope.getAreaOfInterest());
@@ -161,7 +153,10 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     this.ingester.submit(() -> {
                                         publishNewProductAvailable(p);
                                     });
-                                } catch (IngestionException | IOException ex) {
+                                } catch (IOException ex) {
+                                    LOG.warn("Error on encoding WacodisProductDataEnvelope: " + ex.getMessage());
+                                    LOG.debug("Error on encoding WacodisProductDataEnvelope: " + ex.getMessage(), ex);
+                                } catch (IngestionException ex) {
                                     LOG.warn("Error on ingestion execution: " + ex.getMessage());
                                     LOG.debug("Error on ingestion execution: " + ex.getMessage(), ex);
                                 }

@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import de.wacodis.productlistener.model.AbstractBackend;
+import de.wacodis.productlistener.model.ArcGISImageServerBackend;
+import de.wacodis.productlistener.model.ProductBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,6 +32,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(value = "product-listener.arcgis-image-server.enabled", havingValue = "true")
 public class ArcPyBackend implements IngestionBackend, InitializingBean {
+
+    private static final String WACODIS_SERVICE_FOLDER = "WaCoDiS";
 
     private static final Logger LOG = LoggerFactory.getLogger(ArcPyBackend.class);
 
@@ -58,9 +65,9 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         }
 
         LOG.info("Using python ingestion script at: {}", this.pythonScriptLocation);
-        
+
         isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-        
+
         LOG.info("Running on windows? {}", isWindows);
     }
 
@@ -77,9 +84,9 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
             builder.command("sh", "-c", pythonScriptCommand);
         }
         builder.directory(this.pythonScript.getParent().toFile());
-        
+
         LOG.info("Executing command '{}'", builder.command());
-        
+
         try {
             Process process = builder.start();
             ProcessStreamHandler handler = new ProcessStreamHandler(process.getInputStream(), this::logOutput);
@@ -87,7 +94,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
             executor.submit(handler);
             executor.submit(errorHandler);
             int exitCode = process.waitFor();
-            
+
             if (exitCode != 0) {
                 throw new IngestionException("Python script ended with non-zero exit code: " + exitCode);
             }
@@ -96,8 +103,18 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         }
     }
 
+    @Override
+    public AbstractBackend getServiceBackend(String collectionId) {
+        ArcGISImageServerBackend backend = new ArcGISImageServerBackend();
+        backend.setBackendType(ProductBackend.ARCGISIMAGESERVERBACKEND);
+        backend.setBaseUrl(this.arcgisImageServerUrl);
+        backend.setServiceTypes(Arrays.asList(this.serviceTypes));
+        backend.setProductCollection(String.join("/", WACODIS_SERVICE_FOLDER, collectionId));
+        return backend;
+    }
+
     private void logOutput(String o) {
         LOG.info("[Process output] {}", o);
     }
-    
+
 }

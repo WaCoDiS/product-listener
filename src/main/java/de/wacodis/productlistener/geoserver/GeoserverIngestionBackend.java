@@ -5,6 +5,8 @@ import de.wacodis.productlistener.IngestionException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Base64;
+
+import de.wacodis.productlistener.model.AbstractBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -71,6 +73,11 @@ public class GeoserverIngestionBackend implements IngestionBackend, Initializing
         
         LOG.info("Ingesting new geotiff: {}, {}", targetUrl, entity);
         this.restTemplate.put(targetUrl, entity);
+    }
+
+    @Override
+    public AbstractBackend getServiceBackend(String collectionId) {
+        return null;
     }
 
 }
