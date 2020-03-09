@@ -65,8 +65,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
     }
 
     @Override
-    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId,
-            String serviceName) throws IngestionException {
+    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId) throws IngestionException {
         ProcessBuilder builder = new ProcessBuilder();
         String pythonScriptCommand = String.format("python %s %s %s",
                 this.pythonScript.toAbsolutePath().toString(),

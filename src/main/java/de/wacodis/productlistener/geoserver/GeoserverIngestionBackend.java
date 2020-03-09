@@ -54,7 +54,7 @@ public class GeoserverIngestionBackend implements IngestionBackend, Initializing
     }
 
     @Override
-    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId, String serviceName) throws IngestionException {
+    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId) throws IngestionException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/plain");
 
@@ -67,7 +67,7 @@ public class GeoserverIngestionBackend implements IngestionBackend, Initializing
         HttpEntity<String> entity = new HttpEntity("file://" + resultFile.toAbsolutePath().toString(), headers);
         
         String targetUrl = String.format("%s/rest/workspaces/%s/coveragestores/%s/external.geotiff",
-                this.geoserverUrl, serviceName, resultFile.toFile().getName());
+                this.geoserverUrl, collectionId, resultFile.toFile().getName());
         
         LOG.info("Ingesting new geotiff: {}, {}", targetUrl, entity);
         this.restTemplate.put(targetUrl, entity);

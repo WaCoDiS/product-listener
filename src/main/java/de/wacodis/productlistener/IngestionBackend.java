@@ -5,6 +5,8 @@
  */
 package de.wacodis.productlistener;
 
+import de.wacodis.productlistener.model.AbstractBackend;
+
 import java.nio.file.Path;
 
 /**
@@ -13,7 +15,8 @@ import java.nio.file.Path;
  */
 public interface IngestionBackend {
     
-    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId,
-            String serviceName) throws IngestionException;
+    public void ingestFileIntoCollection(Path resultFile, Path metadataFile, String collectionId) throws IngestionException;
+
+    public AbstractBackend getServiceBackend(String collectionId);
     
 }

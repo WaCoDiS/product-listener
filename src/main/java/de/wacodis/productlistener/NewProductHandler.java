@@ -156,7 +156,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     Path metaFile = Paths.get(this.storageDirectory).resolve(r.getWpsJobIdentifier() + ".meta");
                                     Files.write(metaFile, this.jsonDecoder.encodeToJson(p).getBytes());
 
-                                    this.backend.ingestFileIntoCollection(resultFile, metaFile, r.getProductCollection(), collProperties.getServiceName());
+                                    this.backend.ingestFileIntoCollection(resultFile, metaFile, r.getProductCollection());
 
                                     this.ingester.submit(() -> {
                                         publishNewProductAvailable(p);
