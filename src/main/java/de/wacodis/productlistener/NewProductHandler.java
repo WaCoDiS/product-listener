@@ -132,7 +132,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     p.setDataEnvelopeReferences(r.getDataEnvelopeReferences());
                                     p.setDataEnvelopeServiceEndpoint(this.dataAccessGetDataEnvelopeEndpoint);
 
-                                    AbstractBackend backendDef = backend.getServiceBackend(collProperties.getProductCollection());
+                                    AbstractBackend backendDef = backend.getServiceBackend(collProperties.getProductType());
                                     p.setServiceDefinition(backendDef);
                                     p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
 

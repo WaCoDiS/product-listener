@@ -40,7 +40,9 @@ product-listener:
     url: arcgis.server.url/arcgis/admin
     service-type: ImageServer
   product-collection-mapping:
-    - product-collection: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
-      product-type: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition
-    - product-collection: EO:WACODIS:DAT:NDVI
-      product-type: ndvi
+    - product-collection: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition
+      product-type: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
+    - product-collection: forest_vitality_change
+      product-type: EO:WACODIS:DAT:FOREST-VITALITY-CHANGE
+    - product-collection: ndvi
+      product-type: EO:WACODIS:DAT:NDVI

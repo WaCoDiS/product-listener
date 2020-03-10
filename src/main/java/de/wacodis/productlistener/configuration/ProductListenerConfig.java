@@ -60,12 +60,12 @@ public class ProductListenerConfig {
     public static class ProductCollectionMappingConfig {
 
         /**
-         * Matches the productCollection parameter from WacodisJobDefinition
+         * Matches the resulting collection within the service backend
          */
         private String productCollection;
 
         /**
-         * Matches the resulting collection within the service backend
+         * Matches the productCollection parameter from WacodisJobDefinition
          */
         private String productType;
 
