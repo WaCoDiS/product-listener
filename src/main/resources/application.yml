@@ -43,6 +43,6 @@ product-listener:
     - product-collection: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition
       product-type: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
     - product-collection: forest_vitality_change
-      product-type: EO:WACODIS:DAT:FOREST-VITALITY-CHANGE
+      product-type: EO:WACODIS:DAT:FOREST_VITALITY_CHANGE # beware weird ArcGIS special character handling ('-' no, '_' yes)
     - product-collection: ndvi
       product-type: EO:WACODIS:DAT:NDVI
