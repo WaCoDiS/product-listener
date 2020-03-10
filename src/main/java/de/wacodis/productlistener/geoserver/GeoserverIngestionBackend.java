@@ -5,8 +5,11 @@ import de.wacodis.productlistener.IngestionException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Collections;
 
 import de.wacodis.productlistener.model.AbstractBackend;
+import de.wacodis.productlistener.model.GeoServerBackend;
+import de.wacodis.productlistener.model.ProductBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -83,6 +86,11 @@ public class GeoserverIngestionBackend implements IngestionBackend, Initializing
 
     @Override
     public AbstractBackend getServiceBackend(String collectionId) {
+        GeoServerBackend backendDef = new GeoServerBackend();
+        backendDef.setBackendType(ProductBackend.GEOSERVERBACKEND);
+        backendDef.setBaseUrl(geoserverUrl);
+        backendDef.setProductCollection(collectionId);
+        backendDef.setServiceTypes(Collections.singletonList(serviceType));
         return null;
     }
 

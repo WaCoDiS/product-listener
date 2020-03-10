@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -108,7 +109,7 @@ public class ArcPyBackend implements IngestionBackend, InitializingBean {
         ArcGISImageServerBackend backend = new ArcGISImageServerBackend();
         backend.setBackendType(ProductBackend.ARCGISIMAGESERVERBACKEND);
         backend.setBaseUrl(this.arcgisImageServerUrl);
-        backend.setServiceTypes(Arrays.asList(this.serviceType));
+        backend.setServiceTypes(Collections.singletonList(this.serviceType));
         backend.setProductCollection(String.join("/", WACODIS_SERVICE_FOLDER, collectionId));
         return backend;
     }
