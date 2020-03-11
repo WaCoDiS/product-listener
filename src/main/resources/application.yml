@@ -43,6 +43,12 @@ product-listener:
     - product-collection: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition
       product-type: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
     - product-collection: forest_vitality_change
-      product-type: EO:WACODIS:DAT:FOREST_VITALITY_CHANGE # beware weird ArcGIS special character handling ('-' no, '_' yes)
+      product-type: EO:WACODIS:DAT:FOREST_VITALITY_CHANGE # beware of weird ArcGIS special character handling ('-' no, '_' yes)
     - product-collection: ndvi
       product-type: EO:WACODIS:DAT:NDVI
+    - product-collection: land-cover-classification
+      product-type: EO:WACODIS:DAT:INTRA_LAND_COVER_CLASSIFICATION
+    - product-collection: sealing-factor
+      product-type: EO:WACODIS:DAT:SEALING_FACTOR
+    - product-collection: vegetation-density-lai
+      product-type: EO:WACODIS:DAT:VEGETATION_DENSITY_LAI
