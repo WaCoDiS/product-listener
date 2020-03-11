@@ -3,7 +3,7 @@ FROM alpine/git as clone
 WORKDIR /app
 
 RUN git clone https://github.com/WaCoDiS/wps-client-lib/ wps-client-lib \
-	&& git -C ./wps-client-lib checkout 1.0.4-wacodis
+	&& git -C ./wps-client-lib checkout 1.0.5-wacodis
 
 # ---- Base maven ----
 FROM maven:3.5-jdk-8-slim AS base
