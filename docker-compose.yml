@@ -3,7 +3,7 @@ services:
   product-listener:
     build:
       context: .
-    image: registry.wacodis.demo.52north.org/product-listener:1.1.0
+    image: registry.wacodis.demo.52north.org/product-listener:1.1.1-SNAPSHOT
     network_mode: "host"
     environment:
       - product-listener.file-storage-directory=/wacodis_data/
