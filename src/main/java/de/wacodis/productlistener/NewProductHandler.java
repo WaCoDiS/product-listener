@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -106,6 +107,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                     ProductListenerConfig.ProductCollectionMappingConfig collProperties = this.collectionMapping.get(r.getProductCollection());
 
                     // retrieve the metadata (i.e. the copernicus data envelope of the input product)
+                    LOG.info("Resolving metadata output for WPS Job {}", r.getWpsJobIdentifier());
                     String metadata = this.wpsConnector.getProcessResult(r.getWpsJobIdentifier(), "METADATA");
 
                     if (metadata == null || metadata.isEmpty()) {
@@ -114,16 +116,19 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                     }
 
                     ProcessingMetadata metaEnvelope = this.jsonDecoder.decodeFromJson(metadata, ProcessingMetadata.class);
+                    LOG.info("metadata JSON for WPS Job {}: {}", metaEnvelope);
 
                     if (metaEnvelope == null || metaEnvelope.getTimeFrame() == null) {
                         LOG.warn("The process result did not provide a (valid?) metadata output: {}", r.getWpsJobIdentifier());
                         return;
                     }
 
+                    LOG.info("Processing resolved process outputs. Keys: {}", resultFiles.keySet().stream().collect(Collectors.joining(", ")));
                     resultFiles.keySet().stream()
                             .filter(k -> !k.equalsIgnoreCase("metadata"))
                             .forEach(k -> {
                                 Path resultFile = resultFiles.get(k);
+                                LOG.info("Processing resolved process outputs. {}}: {}", k, resultFile);
 
                                 try {
                                     WacodisProductDataEnvelope p = new WacodisProductDataEnvelope();
@@ -148,6 +153,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     Path metaFile = Paths.get(this.storageDirectory).resolve(r.getWpsJobIdentifier() + ".meta");
                                     Files.write(metaFile, this.jsonDecoder.encodeToJson(p).getBytes());
 
+                                    LOG.info("Starting data ingestion with input files: {}, {}, '{}'", resultFile, metaFile, r.getProductCollection());
                                     this.backend.ingestFileIntoCollection(resultFile, metaFile, r.getProductCollection());
 
                                     this.ingester.submit(() -> {
@@ -161,7 +167,7 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
                                     LOG.debug("Error on ingestion execution: " + ex.getMessage(), ex);
                                 }
                             });
-                } catch (IOException ex) {
+                } catch (IOException | RuntimeException ex) {
                     LOG.warn("Error on wps result processing: " + ex.getMessage());
                     LOG.debug("Error on wps result processing: " + ex.getMessage(), ex);
                 }

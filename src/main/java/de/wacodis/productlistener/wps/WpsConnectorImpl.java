@@ -159,9 +159,11 @@ public class WpsConnectorImpl implements WpsConnector {
     @Override
     public String getProcessResult(String jobId, String outputIdentifier) throws IOException {
         try {
+            LOG.info("retrieving output '{}' for job '{}' from WPS at {}", outputIdentifier, jobId, this.wpsBaseUrl);
             Result result = this.wpsSession.retrieveProcessResult(this.wpsBaseUrl, jobId);
 
             Optional<Data> o = result.getOutputs().stream().filter(d -> outputIdentifier.equalsIgnoreCase(d.getId())).findAny();
+            LOG.info("Found output data: {}", o);
             if (o.isPresent()) {
                 Data data = o.get();
 
