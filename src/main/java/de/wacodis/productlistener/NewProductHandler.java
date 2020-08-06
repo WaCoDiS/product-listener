@@ -139,7 +139,11 @@ public class NewProductHandler implements InitializingBean, DisposableBean {
 
                                     AbstractBackend backendDef = backend.getServiceBackend(collProperties.getProductType());
                                     p.setServiceDefinition(backendDef);
-                                    p.setIdentifier(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
+                                    if (metaEnvelope.getProcess() == null || metaEnvelope.getProcess().isEmpty()) {
+                                        p.setProcess(String.format("%s_%s", r.getProductCollection(), metaEnvelope.getTimeFrame().getStartTime()));
+                                    } else {
+                                        p.setProcess(metaEnvelope.getProcess());
+                                    }
 
                                     // use the time frame, AoI and creation timestamp of process result
                                     p.setTimeFrame(metaEnvelope.getTimeFrame());
