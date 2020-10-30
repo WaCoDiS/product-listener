@@ -44,6 +44,8 @@ public class WpsConnectorImpl implements WpsConnector {
 
     private static final Logger LOG = LoggerFactory.getLogger(WpsConnectorImpl.class);
 
+    private static final String DEFAULT_FILEENDING = ".tif";
+
     private String wpsBaseUrl;
 
     @Autowired
@@ -53,6 +55,8 @@ public class WpsConnectorImpl implements WpsConnector {
 
     private String storageDirectory;
 
+    private boolean useOutputIDInFileName;
+
     @Value("${product-listener.wps-base-url}")
     public void setWpsBaseUrl(String wpsBaseUrl) {
         this.wpsBaseUrl = wpsBaseUrl;
@@ -61,6 +65,11 @@ public class WpsConnectorImpl implements WpsConnector {
     @Value("${product-listener.file-storage-directory}")
     public void setStorageDirectory(String storageDirectory) {
         this.storageDirectory = storageDirectory;
+    }
+
+    @Value("${product-listener.useOutputIDInFileName}")
+    public void setStorageDirectory(boolean useOutputIDInFileName) {
+        this.useOutputIDInFileName = useOutputIDInFileName;
     }
 
     @Autowired
@@ -78,6 +87,7 @@ public class WpsConnectorImpl implements WpsConnector {
         try {
             Result result = this.wpsSession.retrieveProcessResult(this.wpsBaseUrl, jobId);
             Map<String, Path> resultingFiles = new HashMap<>();
+            String fileNamePrefix = DateTime.now().toString(DateTimeFormat.forPattern("yyyyMMdd_HHmm")) + "_" + jobId;
 
             for (String oi : outputIdentifier) {
                 int retriesOnOutput = 0;
@@ -85,7 +95,7 @@ public class WpsConnectorImpl implements WpsConnector {
                 Optional<Data> o = result.getOutputs().stream().filter(d -> oi.equalsIgnoreCase(d.getId())).findAny();
                 while (o.isPresent() && retriesOnOutput++ < 3 && !outputRetrieved) {
                     try {
-                        resultingFiles.put(oi, storeFile(o.get()));
+                        resultingFiles.put(oi, storeFile(o.get(), buildFilePath(fileNamePrefix, oi, DEFAULT_FILEENDING)));
                         outputRetrieved = true;
                     } catch (IOException ex) {
                         LOG.warn("Could not retrieve process output: " + ex.getMessage());
@@ -103,7 +113,7 @@ public class WpsConnectorImpl implements WpsConnector {
         return Collections.emptyMap();
     }
 
-    private Path storeFile(Data data) throws WpsMetadataExecption, URISyntaxException, IOException {
+    private Path storeFile(Data data, Path target) throws WpsMetadataExecption, URISyntaxException, IOException {
 
         ComplexData complexData;
         if (data instanceof ComplexData) {
@@ -124,7 +134,6 @@ public class WpsConnectorImpl implements WpsConnector {
         // 1) no RequestBody: it is a plain HTTP GET link
         // 2) a RequestBody with Body or BodyReference: a HTTP POST must be done with the body
         // currently we only support HTTP GET
-
         if (complexData.getReference().getBody() != null) {
             LOG.warn("A complex data with a POST body was found. This is currently not supported. POST body: " + complexData.getReference().getBody());
             throw new WpsMetadataExecption("Unsupported reference via HTTP POST");
@@ -137,8 +146,6 @@ public class WpsConnectorImpl implements WpsConnector {
 
         LOG.info("Start downloading WPS result: {}", asUri);
 
-        String fileNamePrefix = DateTime.now().toString(DateTimeFormat.forPattern("yyyyMMdd_HHmm"));
-        Path target = Paths.get(this.storageDirectory).resolve(fileNamePrefix + ".tif");
         HttpGet httpGet = new HttpGet(asUri);
 
         // do the download
@@ -154,6 +161,15 @@ public class WpsConnectorImpl implements WpsConnector {
         LOG.info("Result stored to: {}", target);
 
         return target;
+    }
+
+    private Path buildFilePath(String prefix, String outputID, String ending) {
+        String fileName = prefix;
+        if(this.useOutputIDInFileName){
+            fileName = prefix + "_" + outputID;
+        }
+
+        return Paths.get(this.storageDirectory).resolve(fileName + ending);
     }
 
     @Override
