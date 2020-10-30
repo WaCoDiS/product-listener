@@ -5,22 +5,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import de.wacodis.productlistener.model.AbstractDataEnvelopeAreaOfInterest;
 import de.wacodis.productlistener.model.AbstractDataEnvelopeTimeFrame;
-import de.wacodis.productlistener.model.AbstractSubsetDefinition;
+import de.wacodis.productlistener.model.DataEnvelopeQueryQueryParams;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.io.Serializable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * represents POST body parameters that will be used for requesting dataset resource from the DataAccess API
+ * query Data Access API for DataEnvelopes 
  */
-@ApiModel(description = "represents POST body parameters that will be used for requesting dataset resource from the DataAccess API")
+@ApiModel(description = "query Data Access API for DataEnvelopes ")
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-10-30T14:16:51.226+01:00[Europe/Berlin]")
 
-public class DataAccessResourceSearchBody  implements Serializable {
+public class DataEnvelopeQuery  implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @JsonProperty("areaOfInterest")
@@ -29,11 +30,11 @@ public class DataAccessResourceSearchBody  implements Serializable {
   @JsonProperty("timeFrame")
   private AbstractDataEnvelopeTimeFrame timeFrame = null;
 
-  @JsonProperty("inputs")
+  @JsonProperty("queryParams")
   @Valid
-  private List<AbstractSubsetDefinition> inputs = new ArrayList<AbstractSubsetDefinition>();
+  private Map<String, DataEnvelopeQueryQueryParams> queryParams = null;
 
-  public DataAccessResourceSearchBody areaOfInterest(AbstractDataEnvelopeAreaOfInterest areaOfInterest) {
+  public DataEnvelopeQuery areaOfInterest(AbstractDataEnvelopeAreaOfInterest areaOfInterest) {
     this.areaOfInterest = areaOfInterest;
     return this;
   }
@@ -42,8 +43,7 @@ public class DataAccessResourceSearchBody  implements Serializable {
    * Get areaOfInterest
    * @return areaOfInterest
   **/
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
   @Valid
 
@@ -55,7 +55,7 @@ public class DataAccessResourceSearchBody  implements Serializable {
     this.areaOfInterest = areaOfInterest;
   }
 
-  public DataAccessResourceSearchBody timeFrame(AbstractDataEnvelopeTimeFrame timeFrame) {
+  public DataEnvelopeQuery timeFrame(AbstractDataEnvelopeTimeFrame timeFrame) {
     this.timeFrame = timeFrame;
     return this;
   }
@@ -64,8 +64,7 @@ public class DataAccessResourceSearchBody  implements Serializable {
    * Get timeFrame
    * @return timeFrame
   **/
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
   @Valid
 
@@ -77,31 +76,33 @@ public class DataAccessResourceSearchBody  implements Serializable {
     this.timeFrame = timeFrame;
   }
 
-  public DataAccessResourceSearchBody inputs(List<AbstractSubsetDefinition> inputs) {
-    this.inputs = inputs;
+  public DataEnvelopeQuery queryParams(Map<String, DataEnvelopeQueryQueryParams> queryParams) {
+    this.queryParams = queryParams;
     return this;
   }
 
-  public DataAccessResourceSearchBody addInputsItem(AbstractSubsetDefinition inputsItem) {
-    this.inputs.add(inputsItem);
+  public DataEnvelopeQuery putQueryParamsItem(String key, DataEnvelopeQueryQueryParams queryParamsItem) {
+    if (this.queryParams == null) {
+      this.queryParams = new HashMap<String, DataEnvelopeQueryQueryParams>();
+    }
+    this.queryParams.put(key, queryParamsItem);
     return this;
   }
 
   /**
-   * Get inputs
-   * @return inputs
+   * map for any query parameter that should be matched except areaOfInterest and timeFrame  
+   * @return queryParams
   **/
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "map for any query parameter that should be matched except areaOfInterest and timeFrame  ")
 
   @Valid
 
-  public List<AbstractSubsetDefinition> getInputs() {
-    return inputs;
+  public Map<String, DataEnvelopeQueryQueryParams> getQueryParams() {
+    return queryParams;
   }
 
-  public void setInputs(List<AbstractSubsetDefinition> inputs) {
-    this.inputs = inputs;
+  public void setQueryParams(Map<String, DataEnvelopeQueryQueryParams> queryParams) {
+    this.queryParams = queryParams;
   }
 
 
@@ -113,25 +114,25 @@ public class DataAccessResourceSearchBody  implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DataAccessResourceSearchBody dataAccessResourceSearchBody = (DataAccessResourceSearchBody) o;
-    return Objects.equals(this.areaOfInterest, dataAccessResourceSearchBody.areaOfInterest) &&
-        Objects.equals(this.timeFrame, dataAccessResourceSearchBody.timeFrame) &&
-        Objects.equals(this.inputs, dataAccessResourceSearchBody.inputs);
+    DataEnvelopeQuery dataEnvelopeQuery = (DataEnvelopeQuery) o;
+    return Objects.equals(this.areaOfInterest, dataEnvelopeQuery.areaOfInterest) &&
+        Objects.equals(this.timeFrame, dataEnvelopeQuery.timeFrame) &&
+        Objects.equals(this.queryParams, dataEnvelopeQuery.queryParams);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(areaOfInterest, timeFrame, inputs);
+    return Objects.hash(areaOfInterest, timeFrame, queryParams);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class DataAccessResourceSearchBody {\n");
+    sb.append("class DataEnvelopeQuery {\n");
     
     sb.append("    areaOfInterest: ").append(toIndentedString(areaOfInterest)).append("\n");
     sb.append("    timeFrame: ").append(toIndentedString(timeFrame)).append("\n");
-    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+    sb.append("    queryParams: ").append(toIndentedString(queryParams)).append("\n");
     sb.append("}");
     return sb.toString();
   }
