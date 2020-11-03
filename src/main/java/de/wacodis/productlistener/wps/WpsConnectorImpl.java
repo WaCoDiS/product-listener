@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -68,7 +67,7 @@ public class WpsConnectorImpl implements WpsConnector {
     }
 
     @Value("${product-listener.useOutputIDInFileName}")
-    public void setStorageDirectory(boolean useOutputIDInFileName) {
+    public void setUseOutputIDinFileName(boolean useOutputIDInFileName) {
         this.useOutputIDInFileName = useOutputIDInFileName;
     }
 

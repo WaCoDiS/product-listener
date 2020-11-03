@@ -10,22 +10,14 @@ import de.wacodis.productlistener.decode.JsonDecoder;
 import de.wacodis.productlistener.model.*;
 import de.wacodis.productlistener.streams.StreamChannels;
 import de.wacodis.productlistener.wps.WpsConnector;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
