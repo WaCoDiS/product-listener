@@ -66,6 +66,10 @@ public class WpsConnectorImpl implements WpsConnector {
         this.storageDirectory = storageDirectory;
     }
 
+    /**
+     * # should be true to ensure unique filenames when process has multiple outputs (except METADATA)
+     * @param useOutputIDInFileName 
+     */
     @Value("${product-listener.useOutputIDInFileName}")
     public void setUseOutputIDinFileName(boolean useOutputIDInFileName) {
         this.useOutputIDInFileName = useOutputIDInFileName;

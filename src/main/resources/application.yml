@@ -28,6 +28,7 @@ product-listener:
   wps-base-url: https://wacodis.demo.52north.org/wacodis-wps/service
   file-storage-directory: /media/matthes/daten/wacodis_data/
   dataAccessGetDataEnvelopeEndpoint: localhost:8081/dataAccess/dataenvelopes
+  # should be true to ensure unique filenames when process has multiple outputs (except METADATA)
   useOutputIDInFileName: true
   geoserver:
     enabled: true
