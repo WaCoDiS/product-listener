@@ -24,11 +24,11 @@
     </properties>
 
     <scm>
-		<url>https://github.com/WaCoDiS/product-listener</url>
-		<connection>scm:git:git://github.com/WaCoDiS/product-listener.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/WaCoDiS/product-listener.git</developerConnection>
-		<tag>v1.1.0</tag>
-	</scm>
+        <url>https://github.com/WaCoDiS/product-listener</url>
+        <connection>scm:git:git://github.com/WaCoDiS/product-listener.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/WaCoDiS/product-listener.git</developerConnection>
+        <tag>v1.1.0</tag>
+    </scm>
     
     <dependencies>
         <dependency>
@@ -112,6 +112,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <pushChanges>false</pushChanges>
+                </configuration>
             </plugin>
         </plugins>
     </build>
