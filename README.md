@@ -22,6 +22,7 @@ The **WaCoDiS Product Listener** requets processing result (EO-Products) from th
     * [Using Docker](#using-docker)
 5. [Contribution - Developer Information](#contribution---developer-information)
   * [Branching](#branching) 
+  * [Pending Developments] (#pending-developments)
   * [License and Third Party Lib POM Plugins](#license-and-third-party-lib-pom-plugins)
 6. [Contact](#contact)
 7. [Credits and Contributing Organizations](#credits-and-contributing-organizations)
@@ -120,7 +121,7 @@ parameters to configure base settings and connections
 | ------------- |-------------| -----|
 | wps-base-url| service url of the processing environment (OGC WPS) | e.g. *http://localhost:8080/wacodis-wps/service* |
 | file-storage-directory | directory to store received result data sets before ingesting data into the configured backend   | e.g. */media/user/daten/wacodis_data/*|
-| dataAccessGetDataEnvelopeEndpoint | HTTP-method to be used   | optional, default is PATCH |
+| dataAccessGetDataEnvelopeEndpoint | url to dataenvelopes endpoint of [Wacodis Data Access API](https://github.com/WaCoDiS/data-access-api)   | e.g. *localhost:8081/dataAccess/dataenvelopes*, access to Data Access API is necessary for compiling product metadata |
 | useOutputIDinFileName | should be true to ensure unique filenames when process has multiple outputs (except METADATA)   | boolean |
 
 ##### spring/product-listener/geoserver
@@ -144,7 +145,17 @@ parameters to configure ARCGis Image Server backend
 | service type | service type   | e.g. *ImageServer*|
 | url | url of the Image Server instance  | e.g. *arcgis.server.url/arcgis/admin* |
 
-
+##### spring/product-listener/arcgis-image-server
+Extendable list of collection mappings: Each mapping maps the productCollection parameter in [WacodisJobDefinition](https://github.com/WaCoDiS/apis-and-workflows/blob/master/openapi/src/main/definitions/wacodis-schemas.yml) to a collection within the the service backend. This way different product type can be ingested into differenct collections within the service backend.  
+  
+**Example:**  
+```
+  product-collection-mapping:
+    - product-collection: sentinel-2_level-1c # matches the productCollection parameter from WacodisJobDefinition
+      product-type: EO:WACODIS:DAT:S2A_RAW # matches the resulting collection within the service backend
+    - product-collection: forest-vitality-change
+      product-type: EO:WACODIS:DAT:FOREST_VITALITY_CHANGE # beware of weird ArcGIS special character handling ('-' no, '_' yes)
+```
 
 ### Deployment
 This section describes deployment scenarios, options and preconditions.
@@ -152,6 +163,7 @@ This section describes deployment scenarios, options and preconditions.
 * (without using Docker) In order to run Product Listener Java Runtime Environment (JRE) (version >= 8) must be available. In order to [build Product Listener from source](#installation--building-information) Java Development Kit (JDK) version >= 8) must be abailable. Product Listener is tested with Oracle JDK 8 and OpenJDK 8.
 * In order to receive and publish messages a running instance a running instance of [RabbitMQ message broker](https://www.rabbitmq.com/) must be available.  
 * When running Product Listener as part of the WaCoDiS system, messages are published by [WaCoDiS Core Engine](https://github.com/WaCoDiS/core-engine). For testing purposes other tools can be used to publish/mock messages about processing progress of a WaCoDiS Job.
+* In order to compile product metadata for result data (WacodisProductDataEnvelope) Product Listener needs access to the REST interface of  [WaCoDiS Data Access](https://github.com/WaCoDiS/data-access-api). 
 
 The WaCoDiS Product Listener must be deployed in an envriomnent that allows access to the configured data backend and allows receiving and publishing messages via the message broket (RabbitMQ).
   
@@ -176,6 +188,9 @@ This section contains information for developers.
 
 ### Branching
 The master branch provides sources for stable builds. The develop branch represents the latest (maybe unstable) state of development.
+
+### Pending Developments
+Currently product listener is capable of handling (OGC) Wps jobs with multiple outputs (different output identifier) but cannot handle job outputs with cardinality higher than 1.
 
 ### License and Third Party Lib POM Plugins
 [optional]
