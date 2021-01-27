@@ -85,17 +85,7 @@ available, configuration values located at *src/main/resources/application.yml*.
 #### Parameters
 The following section contains descriptions for configuration parameters structured by configuration section.
 
-##### spring/cloud/stream/bindings/tools-execute
-parameters related to messages on started processing jobs
-
-| value     | description       | note  |
-| ------------- |-------------| -----|
-| destination     | topic used to receive messages about started WaCoDiS jobs | e.g. *wacodis.test.tools.execute* |
-| binder      | defines the binder (message broker)   | |
-| content-type      | content type of  DataEnvelope acknowledgement messages (mime type)   | should always be *application/json* |
-
-
-##### spring/cloud/stream/bindings/wacodis.test.tools-finished
+##### spring/cloud/stream/bindings/wacodis.test.new-process-result
 parameters related to message on successfully finished proessing jobs
 
 | value     | description       | note  |
@@ -104,12 +94,12 @@ parameters related to message on successfully finished proessing jobs
 | binder      | defines the binder (message broker)   |  |
 | content-type      | content type of  DataEnvelope acknowledgement messages (mime type)   | should always be *application/json*  |
 
-##### spring/cloud/stream/bindings/wacodis.test.tools-failure
+##### spring/cloud/stream/bindings/wacodis.new-product
 parameters related to messages on failed processing jobs
 
 | value     | description       | note  |
 | ------------- |-------------| -----|
-| destination     | topic used to receive messages about failed WacoDiS jobs| e.g. *wacodis.test.tools.failure* |
+| destination     | topic used to publish metadata (WacodisProductDataEnvelooe) for ingested data sets| e.g. *wacodis.test.data.available* |
 | binder      | defines the binder (message broker)   |  |
 | content-type      | content type of  DataEnvelope acknowledgement messages (mime type)   | should always be *application/json*  |
 
@@ -123,14 +113,36 @@ parameters related to WaCoDis message broker
 | username | RabbitMQ username (WaCoDiS message broker)   | |
 | password | RabbitMQ password (WaCoDiS message broker)   | |
 
-##### spring/jobdefinitionapi
-parameters to configure connection to WaCoDiS Job Manager
+##### spring/product-listener
+parameters to configure base settings and connections
 
 | value     | description       | note  |
 | ------------- |-------------| -----|
-| baseurl| base URL of Job Manager service  | e.g. *http://localhost:8080* |
-| apiendpoint | API endpoint (path) for job status update   | e.g. */jobDefinitions/jobstatus/*|
-| httpmethod | HTTP-method to be used   | optional, default is PATCH |
+| wps-base-url| service url of the processing environment (OGC WPS) | e.g. *http://localhost:8080/wacodis-wps/service* |
+| file-storage-directory | directory to store received result data sets before ingesting data into the configured backend   | e.g. */media/user/daten/wacodis_data/*|
+| dataAccessGetDataEnvelopeEndpoint | HTTP-method to be used   | optional, default is PATCH |
+| useOutputIDinFileName | should be true to ensure unique filenames when process has multiple outputs (except METADATA)   | boolean |
+
+##### spring/product-listener/geoserver
+parameters to configure geoserver backend
+
+| value     | description       | note  |
+| ------------- |-------------| -----|
+| enable| true if ingestion of result data into geoserver should be enabled | boolean |
+| url | url of geoserver instance  | e.g. *http://localhost:8080/geoserver*|
+| service type | OGC Web Service   | e.g. *WMS* for Web Mapping Service|
+| username | username for geoserver instance   ||
+| username | username for geoserver user  ||
+
+##### spring/product-listener/arcgis-image-server
+parameters to configure ARCGis Image Server backend
+
+| value     | description       | note  |
+| ------------- |-------------| -----|
+| enable| true if ingestion of result data into Image Server should be enabled | boolean |
+| python-script-location | path to python script that handles data ingestion into Image Server  | e.g. */home/dummy-ingestion.py* [see](https://github.com/WaCoDiS/Tools/tree/master/imageServicePublisher)|
+| service type | service type   | e.g. *ImageServer*|
+| url | url of the Image Server instance  | e.g. *arcgis.server.url/arcgis/admin* |
 
 
 
