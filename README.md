@@ -132,7 +132,7 @@ parameters to configure geoserver backend
 | url | url of geoserver instance  | e.g. *http://localhost:8080/geoserver*|
 | service type | OGC Web Service   | e.g. *WMS* for Web Mapping Service|
 | username | username for geoserver instance   ||
-| username | username for geoserver user  ||
+| password | password for geoserver user  ||
 
 ##### spring/product-listener/arcgis-image-server
 parameters to configure ARCGis Image Server backend
