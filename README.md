@@ -44,7 +44,7 @@ For a detailed overview about the WaCoDiS system architecture please visit the
 **[WaCoDiS Core Engine](https://github.com/WaCoDiS/core-engine)** repository.  
 
 ## Overview  
-The **WaCoDiS Job Status Listerner** subscribes to messages about finished processing jobs (published by the WaCoDiS Core Engine via the system's message broker). The Product Listener request the generated results (EO-Products) from the processing environment and ingests the received data into a configured data backend. Finally the Product Listener compiles metadata for the ingested data ([WacodisProductDataEnvelope](https://github.com/WaCoDiS/apis-and-workflows/blob/master/openapi/src/main/definitions/wacodis-schemas.yml)) and publishes this metadata via the systems message broker. 
+The **WaCoDiS Job Status Listener** subscribes to messages about finished processing jobs (published by the WaCoDiS Core Engine via the system's message broker). The Product Listener request the generated results (EO-Products) from the processing environment and ingests the received data into a configured data backend. Finally the Product Listener compiles metadata for the ingested data ([WacodisProductDataEnvelope](https://github.com/WaCoDiS/apis-and-workflows/blob/master/openapi/src/main/definitions/wacodis-schemas.yml)) and publishes this metadata via the systems message broker. 
 ### Modules
 The WaCoDiS Product Listener is a stand-alone Spring Boot application comprisiung only a single module.
 ### Utilized Technologies
