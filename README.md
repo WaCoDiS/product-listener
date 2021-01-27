@@ -22,7 +22,7 @@ The **WaCoDiS Product Listener** requets processing result (EO-Products) from th
     * [Using Docker](#using-docker)
 5. [Contribution - Developer Information](#contribution---developer-information)
   * [Branching](#branching) 
-  * [Pending Developments] (#pending-developments)
+  * [Pending Developments](#pending-developments)
   * [License and Third Party Lib POM Plugins](#license-and-third-party-lib-pom-plugins)
 6. [Contact](#contact)
 7. [Credits and Contributing Organizations](#credits-and-contributing-organizations)
@@ -145,7 +145,7 @@ parameters to configure ARCGis Image Server backend
 | service type | service type   | e.g. *ImageServer*|
 | url | url of the Image Server instance  | e.g. *arcgis.server.url/arcgis/admin* |
 
-##### spring/product-listener/arcgis-image-server
+##### spring/product-listener/product-collection-mapping
 Extendable list of collection mappings: Each mapping maps the productCollection parameter in [WacodisJobDefinition](https://github.com/WaCoDiS/apis-and-workflows/blob/master/openapi/src/main/definitions/wacodis-schemas.yml) to a collection within the the service backend. This way different product type can be ingested into differenct collections within the service backend.  
   
 **Example:**  
@@ -181,7 +181,7 @@ Product Listener is a Spring Boot application. Execute the compiled jar (`java -
 1. Build Docker Image from [Dockerfile](https://github.com/WaCoDiS/job-status-listener/blob/master/Dockerfile) that resides in the project's root folder.
 2. Run created Docker Image.
 
-Alternatively, latest available docker image (automatically built from master branch) can be pulled from [Docker Hub]https://hub.docker.com/r/wacodis/product-listener). See [WaCoDiS Docker repository](https://github.com/WaCoDiS/wacodis-docker) for pre-configured Docker Compose files to run WaCoDiS system components and backend services (RabbitMQ and Elasticsearch).
+Alternatively, latest available docker image (automatically built from master branch) can be pulled from [Docker Hub](https://hub.docker.com/r/wacodis/product-listener). See [WaCoDiS Docker repository](https://github.com/WaCoDiS/wacodis-docker) for pre-configured Docker Compose files to run WaCoDiS system components and backend services (RabbitMQ and Elasticsearch).
 
 ## Contribution - Developer Information
 This section contains information for developers.
