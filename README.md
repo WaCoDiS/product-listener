@@ -141,7 +141,7 @@ parameters to configure ARCGis Image Server backend
 | value     | description       | note  |
 | ------------- |-------------| -----|
 | enable| true if ingestion of result data into Image Server should be enabled | boolean |
-| python-script-location | path to python script that handles data ingestion into Image Server  | e.g. */home/dummy-ingestion.py* [see](https://github.com/WaCoDiS/Tools/tree/master/imageServicePublisher)|
+| python-script-location | path to python script that handles data ingestion into Image Server  | e.g. */home/dummy-ingestion.py*, [see](https://github.com/WaCoDiS/Tools/tree/master/imageServicePublisher)|
 | service type | service type   | e.g. *ImageServer*|
 | url | url of the Image Server instance  | e.g. *arcgis.server.url/arcgis/admin* |
 
