@@ -190,7 +190,7 @@ This section contains information for developers.
 The master branch provides sources for stable builds. The develop branch represents the latest (maybe unstable) state of development.
 
 ### Pending Developments
-Currently product listener is capable of handling (OGC) Wps jobs with multiple outputs (different output identifier) but cannot handle job outputs with cardinality higher than 1.
+Currently product listener is capable of handling OGC WPS jobs with multiple outputs (different output identifier) but cannot handle job outputs with cardinality higher than 1.
 
 ### License and Third Party Lib POM Plugins
 [optional]
