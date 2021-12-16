@@ -6,24 +6,10 @@ The **WaCoDiS Product Listener** requets processing result (EO-Products) from th
 **Table of Content**  
 
 1. [WaCoDiS Project Information](#wacodis-project-information)
-  * [Architecture Overview](#architecture-overview)
 2. [Overview](#overview)
-  * [Modules](#modules)
-  * [Utilized Technologies](#utilized-technologies)
 3. [Installation / Building Information](#installation--building-information)
-  * [Build from Source](#build-from-source)
-  * [Build using Docker](#build-using-docker)
-  * [Configuration](#configuration)
-    * [Parameters](#parameters)
-  * [Deployment](#deployment)
-    * [Preconditions](#preconditions)
 4. [User Guide](#user-guide)
-  * [Run Product Listener](#run-product-listener)
-    * [Using Docker](#using-docker)
 5. [Contribution - Developer Information](#contribution---developer-information)
-  * [Branching](#branching) 
-  * [Pending Developments](#pending-developments)
-  * [License and Third Party Lib POM Plugins](#license-and-third-party-lib-pom-plugins)
 6. [Contact](#contact)
 7. [Credits and Contributing Organizations](#credits-and-contributing-organizations)
 
@@ -192,16 +178,19 @@ The master branch provides sources for stable builds. The develop branch represe
 ### Pending Developments
 Currently product listener is capable of handling OGC WPS jobs with multiple outputs (different output identifier) but cannot handle job outputs with cardinality higher than 1.
 
-### License and Third Party Lib POM Plugins
-[optional]
+### License
+Apache License, Version 2.0
+
+### Contributing Developers
+|    Name   |   Organization    |    GitHub    |
+| :-------------: |:-------------:| :-----:|
+| Matthes Rieke | 52° North GmbH | [matthesrieke](https://github.com/matthesrieke) |
+| Sebastian Drost | 52° North GmbH | [SebaDro](https://github.com/SebaDro) |
+| Arne Vogt | 52° North GmbH | [arnevogt](https://github.com/arnevogt) |
 
 ## Contact
-|    Name   |   Organization    |    Mail    |
-| :-------------: |:-------------:| :-----:|
-| Sebastian Drost | Bochum University of Applied Sciences | sebastian.drost@hs-bochum.de |
-| Arne Vogt | Bochum University of Applied Sciences | arne.vogt@hs-bochum.de |
-| Andreas Wytzisk  | Bochum University of Applied Sciences | andreas.wytzisk@hs-bochum.de |
-| Matthes Rieke | 52° North GmbH | m.rieke@52north.org |
+The WaCoDiS project is maintained by [52°North GmbH](https://52north.org/). If you have any questions about this or any
+other repository related to WaCoDiS, please contact wacodis-info@52north.org.
 
 ## Credits and Contributing Organizations
 - Department of Geodesy, Bochum University of Applied Sciences, Bochum
