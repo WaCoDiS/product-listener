@@ -9,7 +9,7 @@
     </parent>
     <groupId>de.wacodis</groupId>
     <artifactId>product-listener</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
     <name>WaCoDiS product listener</name>
     <description>Application for listening on new available products and initialising storage/ingestion</description>
     <inceptionYear>2019</inceptionYear>
@@ -28,7 +28,7 @@
         <url>https://github.com/WaCoDiS/product-listener</url>
         <connection>scm:git:git://github.com/WaCoDiS/product-listener.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/WaCoDiS/product-listener.git</developerConnection>
-        <tag>v2.0.0</tag>
+        <tag>v2.0.1</tag>
     </scm>
 
     <licenses>
