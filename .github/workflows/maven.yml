@@ -13,6 +13,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Checkout WPS client lib
+        uses: actions/checkout@v2
+        with:
+          repository: WaCoDiS/wps-client-lib
+          ref: 1.0.8-wacodis
+          path: wps-client-lib
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -24,5 +30,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+      - name: Build dependencies
+        run: mvn -B install --file ./wps-client-lib/pom.xml
       - name: Build
         run: mvn -B package --file pom.xml
