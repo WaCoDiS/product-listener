@@ -163,7 +163,7 @@
                     <plugin>
                         <groupId>com.mycila</groupId>
                         <artifactId>license-maven-plugin</artifactId>
-                        <inherited>false</inherited>
+                        <inherited>true</inherited>
                         <configuration>
                             <aggregate>true</aggregate>
                             <header>etc/license-header.txt</header>
